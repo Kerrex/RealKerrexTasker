@@ -30,8 +30,8 @@ export default Base.extend({
             token: response.token
           });
         });
-      }, (xhr, status, error) => {
-        var response = xhr.responseText;
+      }, (xhr/*, status, error*/) => {
+        let response = xhr.responseText;
         Ember.run(function() {
           reject(response);
         });

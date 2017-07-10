@@ -1,0 +1,170 @@
+#login-dp {
+  min-width: 250px;
+  padding: 14px 14px 0;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, .8);
+}
+
+#login-dp .help-block {
+  font-size: 12px
+}
+
+#login-dp .bottom {
+  background-color: rgba(255, 255, 255, .8);
+  border-top: 1px solid #ddd;
+  clear: both;
+  padding: 14px;
+}
+
+#login-dp .social-buttons {
+  margin: 12px 0
+}
+
+#login-dp .social-buttons a {
+  width: 49%;
+}
+
+#login-dp .form-group {
+  margin-bottom: 10px;
+}
+
+.btn-fb {
+  color: #fff;
+  background-color: #3b5998;
+}
+
+.btn-fb:hover {
+  color: #fff;
+  background-color: #496ebc
+}
+
+.btn-tw {
+  color: #fff;
+  background-color: #55acee;
+}
+
+.btn-tw:hover {
+  color: #fff;
+  background-color: #59b5fa;
+}
+
+@media (max-width: 768px) {
+  #login-dp {
+    background-color: inherit;
+    color: #fff;
+  }
+
+  #login-dp .bottom {
+    background-color: inherit;
+    border-top: 0 none;
+  }
+}
+
+.new-project-button {
+  display: table !important;
+  margin: 20px auto !important;
+  background: #2196F3 none !important;
+}
+
+.project-list {
+  width: 40%;
+  text-align: center;
+  margin: auto;
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.project-list a:not(:first-child) li {
+  margin-top: 20px;
+}
+
+.project-list-element {
+  color: white;
+  background-color: #2196F3;
+  text-align: center;
+  height: 200px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  border-radius: 3px;
+}
+
+.project-list-element:hover {
+  background-color: #1976D2;
+}
+
+.project-list-element span {
+  display: block;
+  color: white;
+}
+
+.project-list a:hover {
+  text-decoration: none;
+}
+
+.project-list .project-name {
+  padding-top: 9px;
+  font-size: 2em;
+}
+
+.project-list .project-description {
+  font-size: 1.2em;
+  height: 60%;
+  padding-top: 15px;
+}
+
+.project-list .project-settings {
+  position: relative;
+  float: right;
+  right: 10px;
+  font-size: 20px;
+  bottom: 160px;
+}
+
+.project-list .project-owner {
+  float: left;
+  padding-left: 10px;
+}
+
+@media (max-width: 978px) {
+  .project-list {
+    width: 70%;
+  }
+  .project-list .project-name {
+    padding-top: 9px;
+    font-size: 2em;
+  }
+
+  .project-list .project-description {
+    font-size: 1.2em;
+    height: 60%;
+    padding-top: 15px;
+    font-size: 0.9em;
+  }
+}
+
+@media (max-width: 486px) {
+  .project-list {
+    width: 90%;
+  }
+
+  .project-list .project-name {
+    padding-top: 9px;
+    font-size: 1.5em;
+  }
+
+  .project-list .project-description {
+    height: 60%;
+    padding-top: 15px;
+    font-size: 0.9em;
+  }
+
+  .project-list .project-owner {
+    float: left;
+    padding-left: 10px;
+    font-size: 0.9em;
+  }
+
+  .project-list .project-settings {
+    bottom: -10px;
+  }
+}
+

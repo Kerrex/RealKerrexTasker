@@ -8,11 +8,13 @@ from django.shortcuts import render
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from kerrex_tasker.forms import RegistrationForm
+from kerrex_tasker.models import Project, Permission
+from kerrex_tasker.serializers import ProjectSerializer, PermissionSerializer, UserSerializer
 
 
 @require_http_methods(["POST"])
@@ -37,3 +39,18 @@ def register(request):
         return JsonResponse({"success": "User registered."}, status=201)
 
     return HttpResponse(form.errors.as_json(), status=400, content_type="application/json")
+
+
+class ProjectViewSet(viewsets.ModelViewSet):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+
+
+class PermissionViewSet(viewsets.ModelViewSet):
+    queryset = Permission.objects.all()
+    serializer_class = PermissionSerializer
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer

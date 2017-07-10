@@ -8,8 +8,29 @@ const Router = Ember.Router.extend({
 
 Router.map(function() {
   this.route('login');
-  this.route('register');
-  this.route('main');
+/*  this.route('main', {path: "/"});*/
+  this.route('projects', function() {
+    this.route('new');
+
+    this.route('edit', {
+      path: ':project_id/edit'
+    });
+
+    this.route('show', {
+      path: ':project_id'
+    });
+  });
+  this.route('permissions', function() {
+    this.route('new');
+
+    this.route('edit', {
+      path: ':permission_id/edit'
+    });
+
+    this.route('show', {
+      path: ':permission_id'
+    });
+  });
 });
 
 export default Router;
