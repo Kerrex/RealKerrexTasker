@@ -128,6 +128,7 @@ textarea {
   resize: vertical;
 }
 
+
 .field-wrap {
   position: relative;
   margin-bottom: 40px;
@@ -140,7 +141,7 @@ textarea {
 }
 .top-row > div {
   float: left;
-  width: 48%;
+  width: 100%;
   margin-right: 4%;
 }
 .top-row > div:last-child {
@@ -174,4 +175,8 @@ textarea {
 .forgot {
   margin-top: -20px;
   text-align: right;
+}
+
+.input-full-size {
+  min-width: 100%;
 }

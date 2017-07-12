@@ -44,6 +44,7 @@ def register(request):
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+    pagination_class = None
 
 
 class PermissionViewSet(viewsets.ModelViewSet):

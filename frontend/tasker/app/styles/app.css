@@ -5,8 +5,48 @@
   background-color: rgba(255, 255, 255, .8);
 }
 
+body{
+  font-family: 'Titillium Web', sans-serif;
+}
+
+.navbar {
+  border-radius: 0px !important;
+  border: none !important;
+}
+
+.navbar-inverse {
+  background-color: #2196F3 !important;
+  border: none !important;
+}
+
+.navbar-inverse .navbar-toggle {
+    border-color: #2196F3 !important;
+}
+
+.navbar-inverse .navbar-toggle:hover, .navbar-inverse .navbar-toggle:focus {
+    background-color: #2196F3 !important;
+}
+
+.navbar-inverse .navbar-collapse, .navbar-inverse .navbar-form {
+    border: none !important;
+}
+
+
+.navbar-inverse .navbar-nav > li > a{
+  color:#ffffff;
+}
+
+.navbar-inverse .navbar-nav > li > a:hover{
+  color:#000000;
+}
+
+.navbar-brand{
+  color: #ffffff !important;
+  font-weight: bold;
+}
+
 #login-dp .help-block {
-  font-size: 12px
+  font-size: 12px;
 }
 
 #login-dp .bottom {
@@ -63,28 +103,28 @@
 .new-project-button {
   display: table !important;
   margin: 20px auto !important;
-  background: #2196F3 none !important;
+ /* background: #2196F3 none !important;*/
 }
 
 .project-list {
-  width: 40%;
   text-align: center;
   margin: auto;
   list-style-type: none;
   padding-left: 0;
 }
 
-.project-list a:not(:first-child) li {
+/*.project-list a:not(:first-child) li {
   margin-top: 20px;
-}
+}*/
 
 .project-list-element {
   color: white;
   background-color: #2196F3;
   text-align: center;
-  height: 200px;
+  height: 300px;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   border-radius: 3px;
+  margin-bottom: 25px;
 }
 
 .project-list-element:hover {
@@ -109,6 +149,7 @@
   font-size: 1.2em;
   height: 60%;
   padding-top: 15px;
+  padding: 20px;
 }
 
 .project-list .project-settings {
@@ -116,7 +157,7 @@
   float: right;
   right: 10px;
   font-size: 20px;
-  bottom: 160px;
+  bottom: 210px;
 }
 
 .project-list .project-owner {
@@ -138,6 +179,11 @@
     height: 60%;
     padding-top: 15px;
     font-size: 0.9em;
+
+  }
+
+  .project-description{
+    padding:20px;
   }
 }
 
