@@ -23,6 +23,9 @@ class Project(models.Model):
     default_permission = models.ForeignKey(Permission, on_delete=models.CASCADE, null=False)
     owner = models.ForeignKey(User, null=False)
 
+    def __str__(self):
+        return '{0} - {1}'.format(self.name, self.owner.username)
+
     class JSONAPIMeta:
         resource_name = 'project'
 
@@ -45,8 +48,14 @@ class Category(models.Model):
     order_in_project = models.IntegerField(null=False)
     project = models.ForeignKey(Project, null=False, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return '{0}, no. {1}'.format(self.name, self.order_in_project)
+
     class JSONAPIMeta:
         resource_name = 'category'
+
+    class Meta:
+        unique_together = ('project', 'order_in_project')
 
 
 class Card(models.Model):

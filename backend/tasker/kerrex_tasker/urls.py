@@ -4,12 +4,14 @@ from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.routers import DefaultRouter
 
-from kerrex_tasker.views import register, ProjectViewSet, PermissionViewSet, UserViewSet
+from kerrex_tasker.views import register, ProjectViewSet, PermissionViewSet, UserViewSet, CardViewSet, CategoryViewSet
 
 router = routers.DefaultRouter(trailing_slash=False)
 router.register('projects', ProjectViewSet)
 router.register('permissions', PermissionViewSet)
 router.register('users', UserViewSet)
+router.register('cards', CardViewSet)
+router.register('categories', CategoryViewSet)
 
 urlpatterns = [
     url(r'^api-auth-token/', obtain_auth_token),

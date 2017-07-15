@@ -148,3 +148,6 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
 }
+
+JSON_API_PLURALIZE_RELATION_TYPE = True
+JSON_API_PLURALIZE_TYPES = True

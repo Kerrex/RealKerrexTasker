@@ -10,6 +10,8 @@ export default Ember.Route.extend(AuthenticatedRouteMixin, {
     }
   },
   model: function() {
-    return this.store.findAll('permission');
+    let permission = this.store.findAll('permission');
+    console.log(permission.objectAt(0));
+    return permission;
   }
 });

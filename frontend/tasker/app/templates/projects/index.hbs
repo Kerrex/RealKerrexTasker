@@ -1,53 +1,18 @@
-<div class="container">emb
+<div class="container">
   <h1 style="text-align: center">Lista projektów</h1>
 
   <p>
     {{link-to "Dodaj nowy projekt" "projects.new" class="new-project-button btn btn-info"}}
   </p>
-  <div class="row">
-    {{#if model.length}}
-      <ul class="project-list">
-        {{#each model as |project|}}
-          {{#link-to 'projects.show' project class="board-tile"}}
-            <div class="col-md-4 col-sm-12">
-              <li class="project-list-element">
-
-                <span class="project-name">{{project.name}}</span>
-                <span class="project-description">{{project.description}}</span>
-                <span class="project-owner">Właściciel: {{project.owner.username}}</span>
-                {{#link-to 'projects.edit' project class="project-settings"}}
-                  <span class="glyphicon glyphicon-cog"></span>
-                {{/link-to}}
-
-              </li>
-            </div>
-          {{/link-to}}
-        {{/each}}
-      </ul>
-    {{else}}
-      <p id="blankslate">
-        Nie znaleziono projektów
-      </p>
-    {{/if}}
-  </div>
+  {{project-list list=model}}
 </div>
 
 <style>
-  .project-list-element{
+  .project-list-element {
     transition: all .2s ease-in-out;
   }
 
-   .project-list-element:hover{
+  .project-list-element:hover {
     transform: scale(1.1);
   }
 </style>
-
-<script>
-  window.sr = ScrollReveal();
-
-  sr.reveal('.project-list-element',{
-      duration: 2000,
-    origin: 'left',
-    distance: '100px'
-  });
-</script>

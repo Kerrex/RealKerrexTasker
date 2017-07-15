@@ -3,34 +3,5 @@
 </p>
 
 <h1>Project show</h1>
-
-<p>
-  <strong>Name:</strong>
-  <span>{{model.name}}</span>
-</p>
-
-<p>
-  <strong>Description:</strong>
-  <span>{{model.description}}</span>
-</p>
-
-<p>
-  <strong>Date created:</strong>
-  <span>{{model.dateCreated}}</span>
-</p>
-
-<p>
-  <strong>Last modified:</strong>
-  <span>{{model.lastModified}}</span>
-</p>
-
-<p>
-  <strong>Owner:</strong>
-  <span>{{model.owner.username}}</span>
-</p>
-
-<p>
-  <strong>Default permission:</strong>
-  <span>{{model.defaultPermission.name}}</span>
-</p>
+{{category-list categories=model}}
 

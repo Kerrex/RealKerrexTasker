@@ -2,20 +2,20 @@ import Ember from 'ember';
 
 export default Ember.Mixin.create({
   actions: {
-    save: function() {
+    save: function () {
       var route = this;
-      this.currentModel.save().then(function() {
+      this.currentModel.project.save().then(function () {
         route.transitionTo('projects');
-      }, function() {
+      }, function () {
         console.log('Failed to save the model');
       });
     },
 
-    willTransition() {
+    /*willTransition() {
       this._super(...arguments);
       const record = this.controller.get('model');
       record.rollbackAttributes();
-    },
+    },*/
   },
 
 });

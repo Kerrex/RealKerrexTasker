@@ -1,23 +1,40 @@
-<form {{action "save" on="submit"}}>
-  <div>
-    <label>
-      Name
-      {{input type="text" value=model.name}}
+<form {{action "save" on="submit"}} class="form-horizontal">
+  <div class="form-group">
+    <label class="control-label col-sm-2" for="name">
+      Nazwa
     </label>
+    <div class="col-sm-10">
+      {{input type="text" value=project.name class="form-control" id="name"}}
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="control-label col-sm-2" for="description">
+      Opis
+    </label>
+    <div class="col-sm-10">
+      {{input type="text" value=project.description class="form-control"}}
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="control-label col-sm-2" for="permission">
+      Domyślna polityka
+    </label>
+    <div class="col-sm-10">
+      <div>
+        <select onchange={{action "selectPermission" value="target.value"}} class="form-control">
+          {{#each permissions as |permission|}}
+            {{#if (eq project.defaultPermission.id permission.id)}}
+              <option value={{permission.id}} selected>{{permission.name}}</option>
+            {{else}}
+              {{permission.id}}
+              <option value={{permission.id}}>{{permission.name}}</option>
+            {{/if}}
+          {{/each}}
+        </select>
+      </div>
+    </div>
   </div>
   <div>
-    <label>
-      Description
-      {{input type="text" value=model.description}}
-    </label>
-  </div>
-  <div>
-    <label>
-      Default permission
-      {{input type="select" value=model.defaultPermission}}
-    </label>
-  </div>
-  <div>
-    <input type="submit" value="Save">
+    <input type="submit" value="Save" class="btn btn-primary">
   </div>
 </form>

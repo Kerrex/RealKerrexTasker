@@ -8,8 +8,8 @@ const Router = Ember.Router.extend({
 
 Router.map(function() {
   this.route('login');
-/*  this.route('main', {path: "/"});*/
-  this.route('projects', function() {
+  /*  this.route('main', {path: "/"});*/
+  this.route('projects', {path: "/"}, function() {
     this.route('new');
 
     this.route('edit', {
@@ -17,7 +17,7 @@ Router.map(function() {
     });
 
     this.route('show', {
-      path: ':project_id'
+      path: ':projectId'
     });
   });
   this.route('permissions', function() {
@@ -29,6 +29,28 @@ Router.map(function() {
 
     this.route('show', {
       path: ':permission_id'
+    });
+  });
+  this.route('categories', function() {
+    this.route('new');
+
+    this.route('edit', {
+      path: ':category_id/edit'
+    });
+
+    this.route('show', {
+      path: ':category_id'
+    });
+  });
+  this.route('cards', function() {
+    this.route('new');
+
+    this.route('edit', {
+      path: ':card_id/edit'
+    });
+
+    this.route('show', {
+      path: ':card_id'
     });
   });
 });

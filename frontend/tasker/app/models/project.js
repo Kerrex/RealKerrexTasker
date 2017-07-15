@@ -7,4 +7,7 @@ export default DS.Model.extend({
   lastModified: DS.attr('date'),
   defaultPermission: DS.belongsTo('permission', {async: true}),
   owner: DS.belongsTo('user', {async: true}),
+  categories: DS.hasMany('category', {inverse: 'project'})
 });
+
+

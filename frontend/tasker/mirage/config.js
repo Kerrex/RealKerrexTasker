@@ -1,5 +1,15 @@
 import Response from "ember-cli-mirage/response";
 export default function() {
+this.get('/cards');
+this.get('/cards/:id');
+this.post('/cards');
+this.del('/cards/:id');
+this.patch('/cards/:id');
+this.get('/categories');
+this.get('/categories/:id');
+this.post('/categories');
+this.del('/categories/:id');
+this.patch('/categories/:id');
 this.get('/permissions');
 this.get('/permissions/:id');
 this.post('/permissions');

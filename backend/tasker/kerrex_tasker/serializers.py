@@ -2,12 +2,20 @@ from django.contrib.auth.models import User
 from rest_framework import serializers, viewsets
 
 from kerrex_tasker.models import Project, Category, Card, CardComment, Permission
+from rest_framework_json_api.relations import ResourceRelatedField
 
 
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = ('name', 'description', 'date_created', 'last_modified', 'owner', 'default_permission')
+
+    owner = ResourceRelatedField(
+        queryset=User.objects
+    )
+    default_permission = ResourceRelatedField(
+        queryset=Permission.objects
+    )
 
 
 class PermissionSerializer(serializers.ModelSerializer):
@@ -18,15 +26,16 @@ class PermissionSerializer(serializers.ModelSerializer):
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
+        many = True
         model = Category
-        fields = ('name', 'order_in_project', 'project')
+        fields = '__all__'
 
 
 class CardSerializer(serializers.ModelSerializer):
     class Meta:
+        many = True
         model = Card
-        fields = ('name', 'description', 'date_created', 'last_modified',
-                  'created_by', 'modified_by', 'priority', 'category')
+        fields = '__all__'
 
 
 class CardCommentSerializer(serializers.ModelSerializer):
