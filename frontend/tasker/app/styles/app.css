@@ -277,7 +277,6 @@ body {
 
 .cardList {
   border: 1px solid #eee;
-  width: 142px;
   min-height: 20px;
   list-style-type: none;
   margin: 0;
@@ -286,9 +285,36 @@ body {
   margin-right: 10px;
 }
 
-cardList li {
+.cardList li {
+  display: block;
   margin: 0 5px 5px 5px;
   padding: 5px;
   font-size: 1.2em;
-  width: 120px;
 }
+
+.ui-state-highlight {
+  background: lightgrey;
+  border: 2px;
+  border-color: black;
+  height: 1.5em;
+  line-height: 1.2em;
+}
+
+.category-list {
+  border: 1px solid #eee;
+  min-height: 20px;
+  list-style-type: none;
+  margin: 0;
+  padding: 5px 0 0 0;
+  float: left;
+  margin-right: 10px;
+}
+
+.category-list-element {
+  display: inline;
+  margin: 0 5px 5px 5px;
+  padding: 5px;
+  font-size: 1.2em;
+  float: left;
+}
+
