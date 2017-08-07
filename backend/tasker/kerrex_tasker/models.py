@@ -67,9 +67,13 @@ class Card(models.Model):
     modified_by = models.ForeignKey(User, models.SET_NULL, null=True, related_name='modified_by')
     priority = models.ForeignKey(Priority, null=True)
     category = models.ForeignKey(Category, null=False)
+    order_in_category = models.IntegerField(null=False)
 
     class JSONAPIMeta:
         resource_name = 'card'
+
+    class Meta:
+        unique_together = ('order_in_category', 'category')
 
 
 class CardComment(models.Model):

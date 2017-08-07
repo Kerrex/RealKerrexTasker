@@ -1,6 +1,6 @@
 <h2 class="ui-state-disabled">{{category.name}}</h2>
 <ul class="connectedCategory cardList {{categoryClass}}">
   {{#each cards as |card|}}
-    <li>{{card.name}}</li>
+    <li data-card-id="{{card.id}}">{{card.name}}</li>
   {{/each}}
 </ul>

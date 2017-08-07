@@ -276,7 +276,6 @@ body {
 }
 
 .cardList {
-  border: 1px solid #eee;
   min-height: 20px;
   list-style-type: none;
   margin: 0;
@@ -301,7 +300,7 @@ body {
 }
 
 .category-list {
-  border: 1px solid #eee;
+  color: #000000;
   min-height: 20px;
   list-style-type: none;
   margin: 0;
@@ -310,11 +309,22 @@ body {
   margin-right: 10px;
 }
 
+.category-list h2 {
+  color: #333333;
+}
+
 .category-list-element {
   display: inline;
   margin: 0 5px 5px 5px;
   padding: 5px;
   font-size: 1.2em;
   float: left;
+  background: #E2E4E6;
+  border-radius: 3px;
+}
+
+.category-list-element li {
+  background: #ffffff;
+  border-radius: 3px;
 }
 

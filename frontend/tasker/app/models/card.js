@@ -7,5 +7,6 @@ export default DS.Model.extend({
   lastModified: DS.attr('date'),
   createdBy: DS.belongsTo('user'),
   modifiedBy: DS.belongsTo('user'),
-  category: DS.belongsTo('category', {inverse: 'cards', async: true})
+  category: DS.belongsTo('category', {inverse: 'cards', async: true}),
+  orderInCategory: DS.attr('number')
 });

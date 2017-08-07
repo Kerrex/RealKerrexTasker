@@ -1,7 +1,10 @@
+<link rel="stylesheet" type="text/css" href="board.css">
 <p>
-  {{link-to "Project list" "projects.index" }}
+  {{#link-to "projects.index" class="btn btn-primary go-to-project-list-button"}}Go to project list{{/link-to}}
 </p>
 
-<h1>TODO NAZWA PROJEKTU</h1>
-{{category-list categories=model}}
+<h2 class="project-name">
+  <a>{{project.name}}</a>
+</h2>
+{{category-list categories=categories}}
 

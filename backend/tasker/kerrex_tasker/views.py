@@ -87,12 +87,19 @@ class CategoryViewSet(viewsets.ModelViewSet):
         query = self.queryset
         if 'filter[project_id]' in self.request.query_params:
             project_id = self.request.query_params['filter[project_id]']
-            query.filter(project=project_id)
+            query = query.filter(project=project_id)
 
-        #TODO dopisać resztę filtrowania
-        return query
+        # TODO dopisać resztę filtrowania
+        return query.order_by('order_in_project')
 
 
 class CardViewSet(viewsets.ModelViewSet):
     queryset = Card.objects.all()
     serializer_class = CardSerializer
+
+    def get_queryset(self):
+        query = self.queryset
+        if 'filter[category_id]' in self.request.query_params:
+            category_id = self.request.query_params['filter[category_id]']
+            query = query.filter(category=category_id)
+        return query.order_by('order_in_category')
