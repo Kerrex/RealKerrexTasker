@@ -3,8 +3,6 @@
   {{#link-to "projects.index" class="btn btn-primary go-to-project-list-button"}}Go to project list{{/link-to}}
 </p>
 
-<h2 class="project-name">
-  <a>{{project.name}}</a>
-</h2>
-{{category-list categories=categories}}
+{{project-name-with-change-name project=project}}
+{{category-list categories=categories project=project}}
 

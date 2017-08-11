@@ -26,6 +26,36 @@ body {
   background-color :rgba(0,0,0,.12);
 }
 
-category-list {
+.category-list {
   border: none;
+}
+
+ui-widget-header,
+.ui-state-default,
+ui-button {
+  background: #CCCCCC;
+  border: 1px solid #B8B8B8;
+  color: #000;
+  font-weight: bold;
+}
+
+.ui-dialog {
+  background-color: #fcfcfc;
+}
+
+.ui-slate-add-new:hover {
+  cursor: pointer;
+  background-color :rgba(0,0,0,.12);
+}
+
+.add-new-category {
+  background-color: #026AA7;
+  padding: 10px;
+  background-color :rgba(0,0,0,.12);
+  cursor: pointer;
+  color: white;
+}
+
+.add-new-category:hover {
+  background-color :rgba(0,0,0,.20);
 }

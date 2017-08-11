@@ -22,6 +22,9 @@
     <div class="col-sm-10">
       <div>
         <select onchange={{action "selectPermission" value="target.value"}} class="form-control">
+          {{#unless project.defaultPermission}}
+            <option selected>Select from list</option>
+          {{/unless}}
           {{#each permissions as |permission|}}
             {{#if (eq project.defaultPermission.id permission.id)}}
               <option value={{permission.id}} selected>{{permission.name}}</option>

@@ -3,6 +3,7 @@ from collections import OrderedDict
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.db.models import F, Max
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 
@@ -69,16 +70,19 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
 
 class PermissionViewSet(viewsets.ReadOnlyModelViewSet):
+    resource_name = 'permissions'
     queryset = Permission.objects.all()
     serializer_class = PermissionSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    resource_name = 'users'
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
+    resource_name = 'categories'
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     pagination_class = None
@@ -92,8 +96,25 @@ class CategoryViewSet(viewsets.ModelViewSet):
         # TODO dopisać resztę filtrowania
         return query.order_by('order_in_project')
 
+    def create(self, request, *args, **kwargs):
+        new_data = request.data
+        new_data['project'] = new_data['project']['id']
+        new_order_in_project_dict = Category.objects.filter(project_id=new_data['project']) \
+            .aggregate(Max('order_in_project'))
+        new_order_in_project = new_order_in_project_dict['order_in_project__max'] + 1 \
+            if new_order_in_project_dict['order_in_project__max'] is not None \
+            else 0
+
+        new_data['order_in_project'] = new_order_in_project
+        serializer = self.get_serializer(data=new_data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
 
 class CardViewSet(viewsets.ModelViewSet):
+    resource_name = 'cards'
     queryset = Card.objects.all()
     serializer_class = CardSerializer
 
@@ -103,3 +124,62 @@ class CardViewSet(viewsets.ModelViewSet):
             category_id = self.request.query_params['filter[category_id]']
             query = query.filter(category=category_id)
         return query.order_by('order_in_category')
+
+    def update(self, request, *args, **kwargs):
+        user = request.user
+        new_data = request.data
+
+        # fix 'got OrderedDict instead of pk error'
+        new_data['created_by'] = new_data['created_by']['id']
+        new_data['modified_by'] = user.id
+        new_data['category'] = new_data['category']['id']
+
+        order_in_category = new_data['order_in_category']
+        category = new_data['category']
+
+        card_to_update = Card.objects.get(pk=new_data['id'])
+        old_category = card_to_update.category_id
+        old_order_in_category = card_to_update.order_in_category
+        print(int(category) != int(old_category))
+        changing_category = int(category) != int(old_category)
+        if changing_category:
+            # increment order for cards in new category
+            Card.objects.filter(category_id=category, order_in_category__gte=order_in_category) \
+                .update(order_in_category=F('order_in_category') + 1)
+        else:
+            card_to_update.order_in_category = -1
+            card_to_update.save()
+            Card.objects.filter(category_id=category, order_in_category__gt=old_order_in_category,
+                                order_in_category__lte=order_in_category) \
+                        .update(order_in_category=F('order_in_category') - 1)
+
+        # perform actual update of card
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=new_data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        # decrement order for cards in old category
+        if changing_category:
+            Card.objects.filter(category_id=old_category, order_in_category__gt=old_order_in_category) \
+                .update(order_in_category=F('order_in_category') - 1)
+        return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        new_data = request.data
+        new_data['category'] = new_data['category']['id']
+        category = new_data['category']
+        order_in_category = new_data['order_in_category']
+        new_data['created_by'] = request.user.id
+        new_data['modified_by'] = request.user.id
+
+        # increment order for cards in new category
+        Card.objects.filter(category_id=category, order_in_category__gte=order_in_category) \
+            .update(order_in_category=F('order_in_category') + 1)
+
+        serializer = self.get_serializer(data=new_data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)

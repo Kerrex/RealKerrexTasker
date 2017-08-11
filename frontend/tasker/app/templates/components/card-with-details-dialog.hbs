@@ -1,0 +1,35 @@
+<li {{action "showCardEditDialog"}} data-card-id="{{card.id}}">{{card.name}}</li>
+<div id="{{cardDetailsDialogId}}">
+  <form {{action 'editCard' on='submit'}}>
+    <fieldset>
+      <div>
+        <h3>Card name</h3>
+        {{#if editingName}}
+          {{input id="name-edit-input" escape-press="disableEditName" focus-out="disableEditName" name="newCardName"
+                  value=card.name class="text ui-widget-content ui-corner-all"}}
+        {{else}}
+          <textbox {{action "enableEditName"}} class="text ui-widget-content ui-corner-all">{{card.name}}</textbox>
+        {{/if}}
+      </div>
+      <div>
+        <h3>Card description</h3>
+        {{#if editingDescription}}
+          {{textarea id="description-edit-input" escape-press="disableEditDescription"
+                     focus-out="disableEditDescription"
+                     value=card.description}}
+        {{else}}
+          {{#if isDescriptionEmpty}}
+            <textbox {{action "enableEditDescription"
+                              class="text ui-widget-content ui-corner-all"}}>Click here to add description
+            </textbox>
+          {{else}}
+            <textbox {{action "enableEditDescription"
+                              class="text ui-widget-content ui-corner-all"}}>{{card.description}}</textbox>
+
+          {{/if}}
+        {{/if}}
+      </div>
+      <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+    </fieldset>
+  </form>
+</div>

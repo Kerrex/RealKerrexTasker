@@ -60,7 +60,7 @@ class Category(models.Model):
 
 class Card(models.Model):
     name = models.CharField(max_length=24)
-    description = models.CharField(max_length=255)
+    description = models.CharField(max_length=255, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User, models.SET_NULL, null=True, related_name='created_by')
