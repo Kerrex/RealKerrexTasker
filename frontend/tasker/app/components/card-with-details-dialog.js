@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import moment from "moment";
 
 export default Ember.Component.extend({
   store: Ember.inject.service(),
@@ -10,6 +11,17 @@ export default Ember.Component.extend({
   editCardDialog: null,
   isDescriptionEmpty: false,
   oldName: null,
+  oldShowOnCalendar: null,
+  showOnCalendar: Ember.computed('card',  {
+    get(key) {
+      return this.get('card.showOnCalendar');
+    },
+    set(key, value) {
+      this.get('card').set('showOnCalendar', value);
+      this.get('card').save();
+      return value;
+    }
+  }),
 
   cardName: Ember.computed('card', {
     get (key) {
@@ -29,14 +41,24 @@ export default Ember.Component.extend({
     }
   }),
 
+  dateModifiedFormatted: Ember.computed('card', function () {
+    return moment(this.get('card').get('lastModified')).format('DD/MM/YYYY hh:mm');
+  }),
+
+  dateCreatedFormatted: Ember.computed('card', function () {
+    return moment(this.get('card').get('dateCreated')).format('DD/MM/YYYY hh:mm');
+  }),
+
   didInsertElement() {
     this.set('oldName', this.get('cardName'));
+    this.set('showOnCalendar', this.get('card.showOnCalendar'));
     this.set('isDescriptionEmpty', Ember.isBlank(this.get('card').get('description')));
+
     let that = this;
     let dialog = Ember.$(`#${this.get("cardDetailsDialogId")}`).dialog({
       autoOpen: false,
-      height: 100,
-      width: 250,
+      height: 400,
+      width: 550,
       closeOnEscape: false,
       modal: true,
       buttons: {
@@ -47,6 +69,7 @@ export default Ember.Component.extend({
       close: function () {
         that.send('disableEditName');
         that.send('disableEditDescription');
+        that.sendAction();
       }
     });
     this.set('editCardDialog', dialog);

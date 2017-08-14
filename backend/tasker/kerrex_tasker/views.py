@@ -120,9 +120,26 @@ class CardViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         query = self.queryset
+        for key in self.request.query_params.keys():
+            print(key)
         if 'filter[category_id]' in self.request.query_params:
             category_id = self.request.query_params['filter[category_id]']
-            query = query.filter(category=category_id)
+            query = query.filter(category_id=category_id)
+
+        if 'filter[category_id][]' in self.request.query_params:
+            category_ids = self.request.GET.getlist('filter[category_id][]')
+            query = query.filter(category_id__in=category_ids)
+
+        if 'filter[showOnCalendar]' in self.request.query_params:
+            show_on_calendar = self.request.query_params['filter[showOnCalendar]'] == 'true'
+            query = query.filter(show_on_calendar=show_on_calendar)
+
+        if 'filter[calendarDateStart]' in self.request.query_params:
+            calendar_date_start = self.request.query_params['filter[calendarDateStart]']
+            if calendar_date_start == '':
+                calendar_date_start = None
+            query = query.filter(calendar_date_start=calendar_date_start)
+
         return query.order_by('order_in_category')
 
     def update(self, request, *args, **kwargs):

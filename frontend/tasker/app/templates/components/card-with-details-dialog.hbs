@@ -6,7 +6,7 @@
         <h3>Card name</h3>
         {{#if editingName}}
           {{input id="name-edit-input" escape-press="disableEditName" focus-out="disableEditName" name="newCardName"
-                  value=card.name class="text ui-widget-content ui-corner-all"}}
+                  value=card.name class="text ui-widget-content ui-corner-all" class="edit-name-textarea"}}
         {{else}}
           <textbox {{action "enableEditName"}} class="text ui-widget-content ui-corner-all">{{card.name}}</textbox>
         {{/if}}
@@ -16,7 +16,7 @@
         {{#if editingDescription}}
           {{textarea id="description-edit-input" escape-press="disableEditDescription"
                      focus-out="disableEditDescription"
-                     value=card.description}}
+                     value=card.description class="edit-description-textarea"}}
         {{else}}
           {{#if isDescriptionEmpty}}
             <textbox {{action "enableEditDescription"
@@ -28,6 +28,32 @@
 
           {{/if}}
         {{/if}}
+      </div>
+      <div class="show-on-calendar">
+        <h3>Calendar options</h3>
+        Show on calendar:
+        {{input type="checkbox" checked=showOnCalendar}}
+        {{#if showOnCalendar}}
+          <p>Start date: {{#unless (eq card.calendarDateStart null)}}
+            {{card.calendarDateStart}}
+          {{else}}
+            Date not selected yet. Please visit calendar!
+          {{/unless}}</p>
+          <p>End date: {{#unless (eq card.calendarDateEnd null)}}
+            {{card.calendarDateEnd}}
+          {{else}}
+            Date not selected yet. Please visit calendar!
+          {{/unless}}</p>
+        {{/if}}
+      </div>
+      <div class="last-modification-details modal-footer">
+        Last modification: <b>{{dateModifiedFormatted}}</b> by {{card.modifiedBy.username}}
+        {{card.modifiedBy.first_name}}
+        {{#if card.modifiedBy.first_name}}
+          ({{card.modifiedBy.first_name}} {{card.modifiedBy.last_name}})
+        {{/if}}
+        <br>
+        Created: <b>{{dateCreatedFormatted}}</b> by {{card.createdBy.username}}
       </div>
       <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
     </fieldset>

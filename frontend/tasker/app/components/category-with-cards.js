@@ -63,6 +63,6 @@ export default Ember.Component.extend({
       });
       newCard.save();
       location.reload();
-    }
+    },
   }
 });

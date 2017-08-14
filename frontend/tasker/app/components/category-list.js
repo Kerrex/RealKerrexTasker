@@ -77,6 +77,9 @@ export default Ember.Component.extend({
       newCategory.save();
       location.reload();
       this.get('addNewCategoryDialog').dialog('close');
+    },
+    reloadModel() {
+      this.sendAction();
     }
   }
 

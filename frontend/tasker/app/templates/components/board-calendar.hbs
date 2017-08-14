@@ -1,0 +1,18 @@
+<link rel="stylesheet" type="text/css" href="fullcalendar.css">
+<div id="board-calendar-modal" class="modal">
+  <div class="modal-content" id="board-calendar-modal-content">
+    <div class="modal-header">
+      <span class="close">&times;</span>
+      <h2>{{project.name}}</h2>
+    </div>
+    <div class="row">
+      <div class="col-md-2">
+        {{not-yet-planned-events project=project}}
+      </div>
+      <div class="col-md-10">
+        <div class="modal-body">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

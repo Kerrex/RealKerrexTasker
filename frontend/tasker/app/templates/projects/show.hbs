@@ -1,8 +1,11 @@
 <link rel="stylesheet" type="text/css" href="board.css">
+<link rel="stylesheet" type="text/css" href="datepicker.css">
 <p>
   {{#link-to "projects.index" class="btn btn-primary go-to-project-list-button"}}Go to project list{{/link-to}}
+  <button id="show-calendar-button" class="btn btn-success go-to-project-list-button">Show calendar</button>
 </p>
 
 {{project-name-with-change-name project=project}}
 {{category-list categories=categories project=project}}
+{{board-calendar showButtonId="show-calendar-button" project=project}}
 

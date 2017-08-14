@@ -7,6 +7,8 @@ module.exports = function (defaults) {
   let app = new EmberApp(defaults, {});
   app.import('bower_components/scrollreveal/dist/scrollreveal.min.js');
   app.import('bower_components/jquery-ui/jquery-ui.min.js');
+  app.import('bower_components/fullcalendar/dist/fullcalendar.js');
+  app.import('bower_components/fullcalendar-scheduler/dist/scheduler.js');
 
   // Use `app.import` to add additional libraries to the generated
   // output files.

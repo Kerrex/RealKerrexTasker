@@ -8,5 +8,8 @@ export default DS.Model.extend({
   createdBy: DS.belongsTo('user'),
   modifiedBy: DS.belongsTo('user'),
   category: DS.belongsTo('category', {inverse: 'cards', async: true}),
-  orderInCategory: DS.attr('number')
+  orderInCategory: DS.attr('number'),
+  calendarDateStart: DS.attr('date'),
+  calendarDateEnd: DS.attr('date'),
+  showOnCalendar: DS.attr('boolean')
 });

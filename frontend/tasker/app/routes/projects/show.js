@@ -8,12 +8,12 @@ export default Ember.Route.extend(AuthenticatedRouteMixin, {
     let project = this.store.find('project', projectId);
     return Ember.RSVP.hash({
       categories: categories,
-      project: project
+      project: project,
     });
   },
   setupController(controller, model) {
     this._super(...arguments);
     Ember.set(controller, 'categories', model.categories);
     Ember.set(controller, 'project', model.project);
-  }
+  },
 });
