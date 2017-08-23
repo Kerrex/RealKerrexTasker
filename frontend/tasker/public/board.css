@@ -183,3 +183,16 @@ ui-button {
   cursor: pointer;
 }
 
+.low-priority {
+  background-color: greenyellow !important;
+}
+
+.medium-priority {
+  background-color: orange !important;
+
+}
+
+.high-priority {
+  background-color: red !important;
+  color: white !important;
+}

@@ -12,6 +12,26 @@ export default Ember.Component.extend({
   isDescriptionEmpty: false,
   oldName: null,
   oldShowOnCalendar: null,
+  priorities: Ember.computed('store', function() {
+    return this.get('store').findAll('priority')
+  }),
+  priorityClass: Ember.computed('card', function() {
+    let priorityId = this.get('priorityId');
+    if (priorityId === '1') {
+      return 'low-priority';
+    } else if (priorityId === '2') {
+      return 'medium-priority';
+    } else if (priorityId === '3') {
+      return 'high-priority';
+    } else {
+      return '';
+    }
+  }),
+
+  priorityId: Ember.computed('card', function () {
+    return this.get('card.priority.id');
+  }),
+
   showOnCalendar: Ember.computed('card',  {
     get(key) {
       return this.get('card.showOnCalendar');
@@ -51,7 +71,7 @@ export default Ember.Component.extend({
 
   didInsertElement() {
     this.set('oldName', this.get('cardName'));
-    this.set('showOnCalendar', this.get('card.showOnCalendar'));
+    //this.set('showOnCalendar', this.get('card.showOnCalendar'));
     this.set('isDescriptionEmpty', Ember.isBlank(this.get('card').get('description')));
 
     let that = this;
@@ -100,6 +120,16 @@ export default Ember.Component.extend({
     },
     saveCard() {
       let name = this.get('card.name');
+      if (Ember.isEmpty(this.get('priorityId'))) {
+        this.get('card').set('priority', null);
+      } else {
+        this.get('store').find('priority', this.get('priorityId')).then(priority => {
+          this.get('card').set('priority', priority);
+          this.get('card').save();
+          console.log(priority);
+        });
+      }
+
       if (!Ember.isBlank(name) && name.length <= 25) {
         console.log(name);
         this.get('card').save();

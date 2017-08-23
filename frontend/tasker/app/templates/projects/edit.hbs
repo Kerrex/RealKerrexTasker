@@ -5,3 +5,52 @@
   <h1>Edytuj projekt</h1>
   {{partial 'projects/form'}}
 </div>
+<div class="form-group">
+  <div class="container">
+    <h2>Project permissions</h2>
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th>Username</th>
+        <th>E-mail</th>
+        <th>Selected permission</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>{{project.owner.username}}</td>
+        <td>{{project.owner.email}}</td>
+        <td>Owner</td>
+      </tr>
+      {{#each userPermissions as |userPermission|}}
+          {{single-permission-row userPermission=userPermission permissions=permissions project=project}}
+      {{/each}}
+      </tbody>
+    </table>
+    <div>
+      <a {{action "openAddPermissionModal"}} class="btn btn-success">Add new user</a>
+    </div>
+  </div>
+</div>
+
+
+<div id="add-edit-permission-modal" class="modal">
+  <div class="modal-content" id="board-calendar-modal-content">
+    <div class="modal-header">
+      <span class="close">&times;</span>
+      <h2>Add user to project</h2>
+    </div>
+    <div class="modal-body">
+      <label for="add-permission-username">Username or e-mail</label>
+      {{input id="add-permission-username" value=permissionUsernameOrEmail}}
+      <div style="margin-top: 20px">
+        <a {{action "addNewPermission"}} class="btn btn-primary">Add</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  Ember.$("#add-edit-permission-modal .close").click(function () {
+    Ember.$("#add-edit-permission-modal").css("display", "none");
+  });
+</script>

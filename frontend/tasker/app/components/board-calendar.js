@@ -1,18 +1,101 @@
 import Ember from 'ember';
+import ENV from 'tasker/config/environment';
 
 export default Ember.Component.extend({
+  store: Ember.inject.service('store'),
+  eventArray: null,
+  self: this,
+
+  hasEditPermission: Ember.computed('store', function() {
+    let that = this;
+    Ember.$.ajax({
+      url: ENV.host + '/api-has-permission/',
+      type: 'POST',
+      data: that.get('project.id'),
+      contentType: 'application/json;charset=utf-8',
+      dataType: 'json'
+    }).then(function(response) {
+      alert(response);
+      that.set('hasEditPermission', response == 'True')
+    }, function(xhr/*, status, error*/) {
+      console.log(xhr);
+      that.set('hasEditPermission', xhr.status === 200)
+    });
+  }),
+
+  updateCardDate(that, cardId, startDate, endDate) {
+    let card = that.get('store').findRecord('card', cardId).then(function (card) {
+      card.set('calendarDateStart', Ember.Date.parse(startDate));
+      card.set('calendarDateEnd', Ember.Date.parse(endDate));
+
+      card.save();
+      console.log(`Card ${cardId}, startDate: ${Ember.Date.parse(startDate)}, endDate: ${Ember.Date.parse(endDate)}`);
+    });
+
+  },
+
+  prepareEventArray(that) {
+    let store = that.get('store');
+    let projectId = that.get('project.id');
+    store.query('category', {filter: {project_id: projectId}}).then(function (categories) {
+      let categoryIds = categories.map(x => x.get('id'));
+      let cards = that.get('store').query('card', {
+        filter: {
+          category_id: categoryIds,
+          showOnCalendar: true,
+        }
+      }).then(function (cards) {
+        let filteredCards = cards.filter(c => Ember.isPresent(c.get('calendarDateStart'))
+          && Ember.isPresent(c.get('calendarDateEnd')));
+        let eventArray = filteredCards.map(x => {
+          return {
+            id: x.get('id'),
+            title: x.get('name'),
+            start: x.get('calendarDateStart'),
+            end: x.get('calendarDateEnd')
+          };
+        });
+        console.log(eventArray);
+
+        let calendar = Ember.$('#board-calendar-modal-content .modal-body');
+        calendar.fullCalendar('removeEvents');
+        calendar.fullCalendar('addEventSource', eventArray);
+        calendar.fullCalendar('refetchEvents');
+      });
+    });
+  },
 
   didInsertElement() {
     const that = this;
+    this.get('prepareEventArray')(this);
     this.$('#board-calendar-modal-content .modal-body').fullCalendar({
       schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
       droppable: true,
+      timezone: "local",
       defaultView: 'agendaWeek',
       editable: true,
       dropAccept: '.not-planned-calendar-event',
       drop: function (date) {
-        alert("Dropped on " + date.format());
-        Ember.$(this).remove();
+        let object = Ember.$(this);
+        let cardId = object.attr('data-attr-id');
+        that.get('updateCardDate')(that, cardId, date.format(), date.add(120, 'm').format());
+        object.remove();
+
+        that.get('prepareEventArray')(that);
+      },
+      eventDrop: function (event) {
+        let cardId = event.id;
+        let startDate = event.start;
+        let endDate = event.end;
+
+        that.get('updateCardDate')(that, cardId, startDate, endDate);
+      },
+      eventResize: function (event) {
+        let cardId = event.id;
+        let startDate = event.start;
+        let endDate = event.end;
+
+        that.get('updateCardDate')(that, cardId, startDate, endDate);
       },
     });
 
@@ -22,6 +105,8 @@ export default Ember.Component.extend({
     button.click(function () {
       that.sendAction();
       modal.css('display', 'block');
+      Ember.$('#board-calendar-modal-content .modal-body').fullCalendar('removeEvents');
+      that.get('prepareEventArray')(that);
     });
     window.onclick = function (event) {
       if (event.target == modal) {

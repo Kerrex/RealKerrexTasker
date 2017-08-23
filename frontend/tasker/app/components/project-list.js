@@ -1,6 +1,7 @@
 import Ember from 'ember';
 
 export default Ember.Component.extend({
+
   didInsertElement() {
     let $this = this.$();
     $this.tooltip({

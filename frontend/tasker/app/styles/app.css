@@ -328,3 +328,46 @@ body {
   border-radius: 3px;
 }
 
+@-webkit-keyframes animateaddpermission {
+  from {
+    top: -300px;
+    opacity: 0
+  }
+  to {
+    top: 0;
+    opacity: 1
+  }
+}
+
+@keyframes animateaddpermission {
+  from {
+    top: -300px;
+    opacity: 0
+  }
+  to {
+    top: 0;
+    opacity: 1
+  }
+}
+
+#add-edit-permission-modal {
+  -webkit-animation-name: animateaddpermission;
+  -webkit-animation-duration: 0.4s;
+  animation-name: animatetop;
+  animation-duration: 0.4s;
+}
+
+#add-edit-permission-modal .modal-content {
+  top: 30%;
+  width: 30%;
+  position: relative;
+  background-color: #fefefe;
+  margin: auto;
+  padding: 0;
+  border: 1px solid #888;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  -webkit-animation-name: animateaddpermission;
+  -webkit-animation-duration: 0.4s;
+  animation-name: animatetop;
+  animation-duration: 0.4s;
+}

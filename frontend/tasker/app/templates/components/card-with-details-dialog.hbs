@@ -1,4 +1,12 @@
-<li {{action "showCardEditDialog"}} data-card-id="{{card.id}}">{{card.name}}</li>
+{{#if (eq priorityId None)}}
+  <li {{action "showCardEditDialog"}} data-card-id="{{card.id}}" class="">{{card.name}}</li>
+{{else if (eq priorityId "1")}}
+  <li {{action "showCardEditDialog"}} data-card-id="{{card.id}}" class="low-priority">{{card.name}}</li>
+{{else if (eq priorityId "2")}}
+  <li {{action "showCardEditDialog"}} data-card-id="{{card.id}}" class="medium-priority">{{card.name}}</li>
+{{else if (eq priorityId "3")}}
+  <li {{action "showCardEditDialog"}} data-card-id="{{card.id}}" class="high-priority">{{card.name}}</li>
+{{/if}}
 <div id="{{cardDetailsDialogId}}">
   <form {{action 'editCard' on='submit'}}>
     <fieldset>
@@ -45,6 +53,21 @@
             Date not selected yet. Please visit calendar!
           {{/unless}}</p>
         {{/if}}
+      </div>
+      <div class="select-priority">
+        <h3>Select priority</h3>
+        <form>
+          <div>
+            {{#radio-button value=None name="priority" groupValue=priorityId}}None{{/radio-button}}
+          </div>
+            {{#each priorities as |priority|}}
+              <div>
+                {{#radio-button value=priority.id name="priority" groupValue=priorityId}}
+                  {{priority.name}}
+                {{/radio-button}}
+              </div>
+            {{/each}}
+        </form>
       </div>
       <div class="last-modification-details modal-footer">
         Last modification: <b>{{dateModifiedFormatted}}</b> by {{card.modifiedBy.username}}

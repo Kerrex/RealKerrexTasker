@@ -13,6 +13,7 @@ export default DS.JSONAPISerializer.extend({
 
       //relationshipObject[relationship] = relationshipObject[relationship].data.id;
     }
+    json.data.type = json.data.type.camelize();
     console.log(json);
     return json;
   },

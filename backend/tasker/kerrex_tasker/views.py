@@ -3,8 +3,8 @@ from collections import OrderedDict
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.db.models import F, Max
-from django.http import JsonResponse, HttpResponse
+from django.db.models import F, Max, Q
+from django.http import JsonResponse, HttpResponse, Http404, HttpResponseForbidden
 from django.shortcuts import render
 
 # Create your views here.
@@ -15,9 +15,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from kerrex_tasker.forms import RegistrationForm
-from kerrex_tasker.models import Project, Permission, Category, Card
+from kerrex_tasker.models import Project, Permission, Category, Card, UserProjectPermission, Priority
 from kerrex_tasker.serializers import ProjectSerializer, PermissionSerializer, UserSerializer, CategorySerializer, \
-    CardSerializer
+    CardSerializer, UserProjectPermissionSerializer, PrioritySerializer
 
 
 @require_http_methods(["POST"])
@@ -44,15 +44,64 @@ def register(request):
     return HttpResponse(form.errors.as_json(), status=400, content_type="application/json")
 
 
+@require_http_methods(["POST"])
+@csrf_exempt
+def has_permission(request):
+    project_id = request.body
+
+    project = Project.objects.get(id=project_id)
+    has_permissions = UserProjectPermission.objects.filter(
+        Q(project_id=project_id) & Q(user_id=request.user.id) & (Q(permission_id=1) | Q(permission_id=3))).exists()
+
+    is_user_blocked = UserProjectPermission.objects.filter(project_id=project_id, user_id=request.user.id,
+                                                           permission_id=4)
+    default_permission_allows = project.default_permission_id == 1 or project.default_permission_id == 3
+    print(default_permission_allows)
+    if project.owner.id == request.user.id or (
+                default_permission_allows and not is_user_blocked) or has_permissions:
+        print(True)
+        return HttpResponse('True')
+    else:
+        return HttpResponseForbidden('False')
+
+
 class ProjectViewSet(viewsets.ModelViewSet):
     resource_name = 'projects'
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     pagination_class = None
 
-    def get_queryset(self):
+    def list(self, request, *args, **kwargs):
         user = self.request.user
-        return Project.objects.filter(owner=user)
+        queryset = self.filter_queryset(self.get_queryset()).filter(Q(owner=user)
+                                                                    | (Q(userprojectpermission__user=user)
+                                                                       & Q(
+            userprojectpermission__permission_id__in=[1, 3])))
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        has_permissions = UserProjectPermission.objects.filter(
+            Q(project=instance) & Q(user_id=request.user.id) & (Q(permission_id=1) | Q(permission_id=3))).exists()
+
+        is_user_blocked = UserProjectPermission.objects.filter(project=instance, user_id=request.user.id,
+                                                               permission_id=4)
+        default_permission_allows = instance.default_permission_id == 1 or instance.default_permission_id == 3
+        print(default_permission_allows)
+        if instance.owner.id == request.user.id or (
+                    default_permission_allows and not is_user_blocked) or has_permissions:
+            serializer = self.get_serializer(instance)
+            return Response(serializer.data)
+        else:
+            raise Http404
 
     def create(self, request, *args, **kwargs):
         user = request.user
@@ -68,6 +117,28 @@ class ProjectViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        default_edit_permission = instance.default_permission_id == 1
+        is_blocked = UserProjectPermission.objects.filter(project=instance, user_id=request.user.id,
+                                                          permission_id=4).exists()
+        has_permission_to_edit = UserProjectPermission.objects.filter(project=instance, user_id=request.user.id,
+                                                                      permission_id=1).exists()
+        if (not default_edit_permission and not has_permission_to_edit) or (default_edit_permission and is_blocked):
+            return HttpResponseForbidden("No permission to edit that project");
+
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
+
 
 class PermissionViewSet(viewsets.ReadOnlyModelViewSet):
     resource_name = 'permissions'
@@ -79,6 +150,14 @@ class UserViewSet(viewsets.ModelViewSet):
     resource_name = 'users'
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    def get_queryset(self):
+        query = self.queryset
+        if 'filter[usernameOrEmail]' in self.request.query_params:
+            username_or_email = self.request.query_params['filter[usernameOrEmail]']
+            query = query.filter(Q(username=username_or_email) | Q(email=username_or_email))
+
+        return query
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -144,31 +223,34 @@ class CardViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         user = request.user
+        print(request.body)
         new_data = request.data
 
         # fix 'got OrderedDict instead of pk error'
         new_data['created_by'] = new_data['created_by']['id']
         new_data['modified_by'] = user.id
         new_data['category'] = new_data['category']['id']
+        new_data['priority'] = new_data['priority']['id'] if new_data['priority'] is not None else None
 
         order_in_category = new_data['order_in_category']
         category = new_data['category']
-
+        print(new_data)
+        # sprawdzanie czy order i kategoria się w ogole zmienily
         card_to_update = Card.objects.get(pk=new_data['id'])
         old_category = card_to_update.category_id
         old_order_in_category = card_to_update.order_in_category
-        print(int(category) != int(old_category))
         changing_category = int(category) != int(old_category)
+        changing_order = int(order_in_category) != int(old_order_in_category)
         if changing_category:
             # increment order for cards in new category
-            Card.objects.filter(category_id=category, order_in_category__gte=order_in_category) \
-                .update(order_in_category=F('order_in_category') + 1)
-        else:
-            card_to_update.order_in_category = -1
-            card_to_update.save()
-            Card.objects.filter(category_id=category, order_in_category__gt=old_order_in_category,
-                                order_in_category__lte=order_in_category) \
-                        .update(order_in_category=F('order_in_category') - 1)
+            self.increment_order_for_new_category(category, order_in_category)
+        elif not changing_category and changing_order:
+            self.move_in_same_category(card_to_update, category, old_order_in_category, order_in_category)
+
+        if new_data['calendar_date_start'] == 'Invalid date':
+            new_data['calendar_date_start'] = None
+        if new_data['calendar_date_end'] == 'Invalid date':
+            new_data['calendar_date_end'] = None
 
         # perform actual update of card
         partial = kwargs.pop('partial', False)
@@ -179,9 +261,38 @@ class CardViewSet(viewsets.ModelViewSet):
 
         # decrement order for cards in old category
         if changing_category:
-            Card.objects.filter(category_id=old_category, order_in_category__gt=old_order_in_category) \
-                .update(order_in_category=F('order_in_category') - 1)
+            self.decrement_order_for_old_category(old_category, old_order_in_category)
+
         return Response(serializer.data)
+
+    def decrement_order_for_old_category(self, old_category, old_order_in_category):
+        cards = Card.objects.filter(category_id=old_category, order_in_category__gt=old_order_in_category) \
+            .order_by('order_in_category')
+        for card in cards:
+            card.order_in_category = card.order_in_category - 1
+            card.save()
+
+    def increment_order_for_new_category(self, category, order_in_category):
+        cards = Card.objects.filter(category_id=category, order_in_category__gte=order_in_category) \
+            .order_by('-order_in_category')
+        for card in cards:
+            card.order_in_category = card.order_in_category + 1
+            card.save()
+
+    def move_in_same_category(self, card_to_update, category, old_order_in_category, order_in_category):
+        card_to_update.order_in_category = -1
+        card_to_update.save()
+        is_raising = order_in_category > old_order_in_category
+        between_touple = ((old_order_in_category, order_in_category) if is_raising
+                          else (order_in_category, old_order_in_category))
+        order_by = 'order_in_category' if is_raising else '-order_in_category'
+        cards_to_move = Card.objects.filter(category_id=category, order_in_category__range=between_touple) \
+            .order_by(order_by)
+        for card in cards_to_move:
+            card.order_in_category = card.order_in_category + (1 if not is_raising else -1)
+            card.save()
+        card_to_update.order_in_category = order_in_category
+        card_to_update.save()
 
     def create(self, request, *args, **kwargs):
         new_data = request.data
@@ -200,3 +311,59 @@ class CardViewSet(viewsets.ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class UserProjectPermissionViewSet(viewsets.ModelViewSet):
+    resource_name = 'userProjectPermissions'
+    queryset = UserProjectPermission.objects.all()
+    serializer_class = UserProjectPermissionSerializer
+    pagination_class = None
+
+    def get_queryset(self):
+        query = self.queryset
+        if 'filter[project_id]' in self.request.query_params:
+            project_id = self.request.query_params['filter[project_id]']
+            query = query.filter(project_id=project_id)
+
+        return query
+
+    def create(self, request, *args, **kwargs):
+        new_data = request.data
+        print(new_data['user'])
+        new_data['user'] = new_data['user']['id']
+        new_data['project'] = new_data['project']['id']
+        new_data['permission'] = 1
+        new_data['given_by'] = request.user.id
+
+        serializer = self.get_serializer(data=new_data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def update(self, request, *args, **kwargs):
+        new_data = request.data
+        new_data['user'] = new_data['user']['id']
+        new_data['project'] = new_data['project']['id']
+        new_data['permission'] = new_data['permission']['id']
+        new_data['given_by'] = request.user.id
+
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=new_data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
+
+
+class PriorityViewSet(viewsets.ModelViewSet):
+    resource_name = 'priorities'
+    queryset = Priority.objects.all()
+    serializer_class = PrioritySerializer
+    pagination_class = None
