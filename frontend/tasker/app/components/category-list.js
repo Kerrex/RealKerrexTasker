@@ -5,7 +5,7 @@ export default Ember.Component.extend({
   store: Ember.inject.service('store'),
   addNewCategoryDialog: null,
 
-  hasEditPermission: Ember.computed('store', function() {
+  hasEditPermission: Ember.computed('store', function () {
     let that = this;
     Ember.$.ajax({
       url: ENV.host + '/api-has-permission/',
@@ -13,10 +13,10 @@ export default Ember.Component.extend({
       data: that.get('project.id'),
       contentType: 'application/json;charset=utf-8',
       dataType: 'json'
-    }).then(function(response) {
+    }).then(function (response) {
       alert(response);
       that.set('hasEditPermission', response == 'True')
-    }, function(xhr/*, status, error*/) {
+    }, function (xhr/*, status, error*/) {
       console.log(xhr);
       that.set('hasEditPermission', xhr.status === 200)
     });
@@ -57,7 +57,9 @@ export default Ember.Component.extend({
         });
       }
     }).disableSelection();
+  },
 
+  didRender() {
     let dialog = Ember.$("#addNewCategoryDialog").dialog({
       autoOpen: false,
       height: 100,
@@ -82,8 +84,10 @@ export default Ember.Component.extend({
     });
     this.set('addNewCategoryDialog', dialog);
   },
+
   actions: {
     showAddNewCategoryDialog() {
+      alert("showing!");
       this.get('addNewCategoryDialog').dialog("open");
     },
 

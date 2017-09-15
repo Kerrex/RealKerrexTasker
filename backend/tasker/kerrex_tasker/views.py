@@ -301,6 +301,8 @@ class CardViewSet(viewsets.ModelViewSet):
         order_in_category = new_data['order_in_category']
         new_data['created_by'] = request.user.id
         new_data['modified_by'] = request.user.id
+        new_data['calendar_date_start'] = None
+        new_data['calendar_date_end'] = None
 
         # increment order for cards in new category
         Card.objects.filter(category_id=category, order_in_category__gte=order_in_category) \

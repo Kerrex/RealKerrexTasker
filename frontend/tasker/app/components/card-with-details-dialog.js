@@ -119,7 +119,6 @@ export default Ember.Component.extend({
       this.send('setIsDescriptionEmpty');
     },
     saveCard() {
-      let name = this.get('card.name');
       if (Ember.isEmpty(this.get('priorityId'))) {
         this.get('card').set('priority', null);
       } else {
@@ -130,12 +129,18 @@ export default Ember.Component.extend({
         });
       }
 
+      let name = this.get('card.name');
       if (!Ember.isBlank(name) && name.length <= 25) {
         console.log(name);
         this.get('card').save();
         this.set('oldName', name);
       } else {
         this.set('cardName', this.get('oldName'));
+      }
+
+      // Must be last in saveCard()
+      if (!this.get('oldShowInCalendar') && !!this.get('card.showInCalendar')) {
+        conso
       }
     },
     setIsDescriptionEmpty() {

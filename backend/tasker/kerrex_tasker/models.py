@@ -68,8 +68,8 @@ class Card(models.Model):
     priority = models.ForeignKey(Priority, null=True)
     category = models.ForeignKey(Category, null=False)
     order_in_category = models.IntegerField(null=False)
-    calendar_date_start = models.DateTimeField(null=True, blank=True)
-    calendar_date_end = models.DateTimeField(null=True, blank=True)
+    calendar_date_start = models.DateTimeField(null=True, blank=True, auto_now=False)
+    calendar_date_end = models.DateTimeField(null=True, blank=True, auto_now=False)
     show_on_calendar = models.BooleanField(default=False)
 
     class JSONAPIMeta:
