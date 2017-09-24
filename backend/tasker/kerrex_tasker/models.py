@@ -88,3 +88,15 @@ class CardComment(models.Model):
 
     class JSONAPIMeta:
         resource_name = 'card_comment'
+
+
+# Push notifications
+class UserNotification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
+    subscription_id = models.CharField(max_length=255)
+
+
+class UserCardNotification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
+    card = models.ForeignKey(Card, on_delete=models.CASCADE, null=False)
+    minutes_before_start = models.IntegerField(null=False)

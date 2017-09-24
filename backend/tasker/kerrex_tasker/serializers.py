@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers, viewsets
 
-from kerrex_tasker.models import Project, Category, Card, CardComment, Permission, UserProjectPermission, Priority
+from kerrex_tasker.models import Project, Category, Card, CardComment, Permission, UserProjectPermission, Priority, \
+    UserCardNotification
 from rest_framework_json_api.relations import ResourceRelatedField
 
 
@@ -62,4 +63,10 @@ class PrioritySerializer(serializers.ModelSerializer):
     class Meta:
         many = True
         model = Priority
+        fields = '__all__'
+
+
+class UserCardNotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserCardNotification
         fields = '__all__'

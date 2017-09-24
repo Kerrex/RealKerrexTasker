@@ -1,11 +1,11 @@
 {{#if (eq priorityId None)}}
-  <li {{action "showCardEditDialog"}} data-card-id="{{card.id}}" class="">{{card.name}}</li>
+  <li {{action "showCardEditDialog"}} data-card-id="{{card.id}}" class="card">{{card.name}}</li>
 {{else if (eq priorityId "1")}}
-  <li {{action "showCardEditDialog"}} data-card-id="{{card.id}}" class="low-priority">{{card.name}}</li>
+  <li {{action "showCardEditDialog"}} data-card-id="{{card.id}}" class="card low-priority">{{card.name}}</li>
 {{else if (eq priorityId "2")}}
-  <li {{action "showCardEditDialog"}} data-card-id="{{card.id}}" class="medium-priority">{{card.name}}</li>
+  <li {{action "showCardEditDialog"}} data-card-id="{{card.id}}" class="card medium-priority">{{card.name}}</li>
 {{else if (eq priorityId "3")}}
-  <li {{action "showCardEditDialog"}} data-card-id="{{card.id}}" class="high-priority">{{card.name}}</li>
+  <li {{action "showCardEditDialog"}} data-card-id="{{card.id}}" class="card high-priority">{{card.name}}</li>
 {{/if}}
 <div id="{{cardDetailsDialogId}}">
   <form {{action 'editCard' on='submit'}}>
@@ -43,12 +43,12 @@
         {{input type="checkbox" checked=showOnCalendar}}
         {{#if showOnCalendar}}
           <p>Start date: {{#unless (eq card.calendarDateStart null)}}
-            {{card.calendarDateStart}}
+            {{calendarDateStartFormatted}}
           {{else}}
             Date not selected yet. Please visit calendar!
           {{/unless}}</p>
           <p>End date: {{#unless (eq card.calendarDateEnd null)}}
-            {{card.calendarDateEnd}}
+            {{calendarDateEndFormatted}}
           {{else}}
             Date not selected yet. Please visit calendar!
           {{/unless}}</p>
@@ -81,4 +81,8 @@
       <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
     </fieldset>
   </form>
+  {{#if notifications.length}}
+  {{else}}
+  {{/if}}
+
 </div>

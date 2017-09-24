@@ -1,6 +1,7 @@
 import Ember from 'ember';
 import { module, test } from 'qunit';
 import startApp from '../helpers/start-app';
+import { currentSession, authenticateSession, invalidateSession } from 'tasker/tests/helpers/ember-simple-auth';
 
 var application;
 var originalConfirm;
@@ -22,98 +23,213 @@ module('Acceptance: Project', {
   }
 });
 
-test('visiting /projects without data', function(assert) {
-  visit('/projects');
+test('visiting / without data', function(assert) {
+  authenticateSession(application);
+  visit('/');
 
   andThen(function() {
     assert.equal(currentPath(), 'projects.index');
-    assert.equal(find('#blankslate').text().trim(), 'No Projects found');
+    assert.equal(find('#blankslate').text().trim(), 'No projects found. Please use button above to add your first one!');
   });
 });
 
 test('visiting /projects with data', function(assert) {
-  server.create('project');
-  visit('/projects');
+  authenticateSession(application);
+  server.create('project', {user_id: 0});
+  visit('/');
 
   andThen(function() {
     assert.equal(currentPath(), 'projects.index');
     assert.equal(find('#blankslate').length, 0);
-    assert.equal(find('table tbody tr').length, 1);
+    assert.equal(find('.board-tile').length, 1);
   });
 });
 
 test('create a new project', function(assert) {
-  visit('/projects');
-  click('a:contains(New Project)');
+  authenticateSession(application);
+  server.loadFixtures('permissions');
+  visit('/');
+  click('.new-project-button');
 
   andThen(function() {
     assert.equal(currentPath(), 'projects.new');
-
-    fillIn('label:contains(Name) input', 'MyString');
-    fillIn('label:contains(Description) input', 'MyString');
-    fillIn('label:contains(Date created) input', new Date());
-    fillIn('label:contains(Last modified) input', new Date());
-    fillIn('label:contains(Owner) input', 'MyString');
-    fillIn('label:contains(Default permission) input', 'MyString');
+    let secondOption = find(".select-permission option:eq(1)");
+    fillIn('input#name', 'NewProject');
+    fillIn('input#description', 'MyProject');
+    fillIn('.select-permission', secondOption.val());
 
     click('input:submit');
   });
 
   andThen(function() {
-    assert.equal(find('#blankslate').length, 0);
-    assert.equal(find('table tbody tr').length, 1);
+    visit('/');
   });
+  andThen(function () {
+    assert.equal(find('#blankslate').length, 0);
+    assert.equal(find('.board-tile').length, 1);
+  });
+});
+
+test('add new permission to existing project', function (assert) {
+  authenticateSession(application);
+  server.loadFixtures('users');
+  server.create('project', {owner_id: 1});
+
+  visit('/1/edit');
+
+  andThen(function () {
+
+    assert.equal(currentPath(), 'projects.edit');
+    assert.equal(currentURL(), "/1/edit");
+    click('.add-new-user-permission-button');
+  });
+
+  andThen(function () {
+    fillIn('#add-permission-username', "email2@email.pl");
+    click('#add-edit-permission-modal .btn');
+  });
+
 });
 
 test('update an existing project', function(assert) {
-  server.create('project');
-  visit('/projects');
-  click('a:contains(Edit)');
+  authenticateSession(application);
+  server.loadFixtures('users');
+  server.create('project', {owner_id: 0});
+  visit('/1/edit');
 
   andThen(function() {
     assert.equal(currentPath(), 'projects.edit');
-
-    fillIn('label:contains(Name) input', 'MyString');
-    fillIn('label:contains(Description) input', 'MyString');
-    fillIn('label:contains(Date created) input', new Date());
-    fillIn('label:contains(Last modified) input', new Date());
-    fillIn('label:contains(Owner) input', 'MyString');
-    fillIn('label:contains(Default permission) input', 'MyString');
-
-    click('input:submit');
+    assert.equal(currentURL(), "/1/edit");
+    fillIn("input#name", "New name");
+    fillIn("input#description", "New description");
+    click('input.btn-primary');
+  });
+  andThen(function () {
+    visit('/');
   });
 
   andThen(function() {
+    let boardTile = find('.board-tile');
+    assert.equal(currentPath(), 'projects.index');
     assert.equal(find('#blankslate').length, 0);
-    assert.equal(find('table tbody tr').length, 1);
+    assert.equal(boardTile.length, 1);
+    assert.equal(boardTile.find('.project-name').text(), "New name");
+    assert.equal(boardTile.find('.project-description').text(), "New description");
   });
 });
 
-test('show an existing project', function(assert) {
+test('enter existing project', function(assert) {
+  authenticateSession(application);
   server.create('project');
-  visit('/projects');
-  click('a:contains(Show)');
+  visit('/');
+  click('.board-tile');
 
   andThen(function() {
     assert.equal(currentPath(), 'projects.show');
-
-    assert.equal(find('p strong:contains(Name:)').next().text(), 'MyString');
-    assert.equal(find('p strong:contains(Description:)').next().text(), 'MyString');
-    assert.equal(find('p strong:contains(Date created:)').next().text(), new Date());
-    assert.equal(find('p strong:contains(Last modified:)').next().text(), new Date());
-    assert.equal(find('p strong:contains(Owner:)').next().text(), 'MyString');
-    assert.equal(find('p strong:contains(Default permission:)').next().text(), 'MyString');
+    assert.equal(currentURL(), '/1')
   });
 });
 
 test('delete a project', function(assert) {
+  authenticateSession(application);
   server.create('project');
-  visit('/projects');
-  click('a:contains(Remove)');
+  visit('/1/edit');
+  click('a.remove-project-button');
 
   andThen(function() {
+    assert.equal(currentPath(), 'projects.delete');
+    assert.equal(currentURL(), "/1/delete");
+
+    click('a.btn-danger');
+  });
+
+  andThen(function () {
     assert.equal(currentPath(), 'projects.index');
-    assert.deepEqual(confirmCalledWith, ['Are you sure?']);
-    assert.equal(find('#blankslate').length, 1);
+    assert.equal(find('#blankslate').text().trim(), 'No projects found. Please use button above to add your first one!');
   });
 });
+
+test('add new category', function (assert) {
+  authenticateSession(application);
+  server.create('project');
+  visit('/1');
+  //click('.add-new-category');
+
+  andThen(() => {
+    assert.equal(find('.category-list-element').length, 1);
+    server.create('category', {project_id: 1});
+    click('.go-to-project-list-button');
+    // Nie działa z powodu JQuery UI i sposobu wyświetlania dialogów
+    //let dialog = find('#addNewCategoryDialog');
+    //fillIn('.new-category-input', "New category");
+    //click('#addNewCategoryDialog .ui-dialog-buttonset'.find('button:eq(0)'));
+  });
+
+  andThen(() => {
+    assert.equal(currentPath(), 'projects.index');
+    click('.board-tile');
+  });
+
+  andThen(() => {
+    assert.equal(currentPath(), 'projects.show');
+    assert.equal(find('.category-list-element').length, 2);
+  });
+});
+
+test('go to project list button on project main page', function (assert) {
+  authenticateSession(application);
+  server.create('project');
+  visit('/1');
+  click('.go-to-project-list-button');
+
+  andThen(() => {
+    assert.equal(currentPath(), 'projects.index');
+  });
+});
+
+test('add new card in existing category', function (assert) {
+  authenticateSession(application);
+  server.create('project');
+  server.create('category', {project_id: 1});
+  visit('/1');
+  //click('.add-new-category');
+
+  andThen(() => {
+    assert.equal(find('.category-list-element').length, 2);
+    assert.equal(find('.category-list .cardList li').length, 1);
+    server.create('card', {category_id: 1});
+    click('.go-to-project-list-button');
+    // Nie działa z powodu JQuery UI i sposobu wyświetlania dialogów
+    //click('.ui-slate-add-new');
+    //fillIn('input[name="newCardName"]', "New card");
+    //click('#addNewCategoryDialog .ui-dialog-buttonset button:eq(0)');
+  });
+
+  andThen(() => {
+    click('.board-tile');
+  });
+
+  andThen(() => {
+    assert.equal(currentPath(), 'projects.show');
+    assert.equal(find('.category-list-element').length, 2);
+    assert.equal(find('.category-list .cardList li').length, 2);
+  });
+});
+
+test('calendar shows up', function (assert) {
+  authenticateSession(application);
+  server.create('project');
+  visit('/1');
+
+  andThen(() => {
+    assert.equal(currentPath(), 'projects.show');
+    assert.equal(find('#board-calendar-modal').css('display'), 'none');
+    click('#show-calendar-button');
+  });
+
+  andThen(() => {
+    assert.equal(find('#board-calendar-modal').css('display'), 'block');
+  });
+});
+
+

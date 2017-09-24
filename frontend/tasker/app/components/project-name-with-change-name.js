@@ -18,7 +18,7 @@ export default Ember.Component.extend({
       alert(response);
       that.set('hasEditPermission', response == 'True')
     }, function (xhr/*, status, error*/) {
-      console.log(xhr);
+      //console.log(xhr);
       that.set('hasEditPermission', xhr.status === 200)
     });
   }),

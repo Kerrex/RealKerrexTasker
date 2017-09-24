@@ -5,12 +5,14 @@ export default Ember.Mixin.create({
     save: function () {
       var route = this;
       this.currentModel.project.save().then(function () {
-        route.currentModel.userPermissions.forEach(permission => {
-          permission.save();
-        });
+        if (route.currentModel.userPermissions) {
+          route.currentModel.userPermissions.forEach(permission => {
+            permission.save();
+          });
+        }
         route.transitionTo('projects');
       }, function () {
-        console.log('Failed to save the model');
+        //console.log('Failed to save the model');
       });
     },
 

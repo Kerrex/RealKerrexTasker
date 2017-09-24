@@ -16,7 +16,7 @@
         <th>Selected permission</th>
       </tr>
       </thead>
-      <tbody>
+      <tbody class="permission-table">
       <tr>
         <td>{{project.owner.username}}</td>
         <td>{{project.owner.email}}</td>
@@ -28,9 +28,13 @@
       </tbody>
     </table>
     <div>
-      <a {{action "openAddPermissionModal"}} class="btn btn-success">Add new user</a>
+      <a {{action "openAddPermissionModal"}} class="btn btn-success add-new-user-permission-button">Add new user</a>
     </div>
   </div>
+</div>
+<div class="well" style="margin: 0 20px;">
+  <h1>Remove project</h1>
+  {{#link-to "projects.delete" project.id class="btn btn-remove remove-project-button"}}Remove this project{{/link-to}}
 </div>
 
 

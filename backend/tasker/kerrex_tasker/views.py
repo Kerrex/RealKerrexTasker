@@ -1,23 +1,25 @@
 import json
 from collections import OrderedDict
 
-from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db.models import F, Max, Q
+import datetime
 from django.http import JsonResponse, HttpResponse, Http404, HttpResponseForbidden
-from django.shortcuts import render
+from django.utils import timezone
 
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from pywebpush import webpush, WebPushException
 from rest_framework import status, viewsets
+from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from kerrex_tasker.forms import RegistrationForm
-from kerrex_tasker.models import Project, Permission, Category, Card, UserProjectPermission, Priority
+from kerrex_tasker.models import Project, Permission, Category, Card, UserProjectPermission, Priority, UserNotification, \
+    UserCardNotification
 from kerrex_tasker.serializers import ProjectSerializer, PermissionSerializer, UserSerializer, CategorySerializer, \
-    CardSerializer, UserProjectPermissionSerializer, PrioritySerializer
+    CardSerializer, UserProjectPermissionSerializer, PrioritySerializer, UserCardNotificationSerializer
 
 
 @require_http_methods(["POST"])
@@ -63,6 +65,84 @@ def has_permission(request):
         return HttpResponse('True')
     else:
         return HttpResponseForbidden('False')
+
+
+@require_http_methods(["POST"])
+@csrf_exempt
+def register_service_worker(request):
+    json_body = json.loads(request.body)
+    user = Token.objects.filter(key=json_body['token']).first().user
+
+    existing_subscription = UserNotification.objects.filter(user=user,
+                                                            subscription_id=json_body['subscription_id']).first()
+    if existing_subscription is not None:
+        existing_subscription.subscription_id = json_body['subscription_id']
+    else:
+        existing_subscription = UserNotification()
+        existing_subscription.user = user
+        existing_subscription.subscription_id = json_body['subscription_id']
+
+    existing_subscription.save()
+
+    return HttpResponse('OK')
+
+
+@require_http_methods(["POST"])
+@csrf_exempt
+def notify(request):
+    for card_notification in UserCardNotification.objects.all():
+        now = timezone.now()
+        card = card_notification.card
+        user = card_notification.user
+        minutes_before_start = datetime.timedelta(minutes=card_notification.minutes_before_start)
+        date_start = card.calendar_date_start
+
+        if date_start is None:
+            continue
+
+        if (now + minutes_before_start) > card.calendar_date_start or card.calendar_date_start < now:
+            user_notification_devices = UserNotification.objects.filter(user=user)
+            for device in user_notification_devices:
+                subscription_info = json.loads(device.subscription_id)
+                data = "{} starts in {} minutes!".format(card.name, card_notification.minutes_before_start)
+                private_key = "nhUMvSrk-65JBY8ExLPvnGnLD_JrtWeSTxgdfJxsnd0"
+                claims = {"sub": "mailto:romen3@gmail.com"}
+                try:
+                    webpush(subscription_info, data, vapid_private_key=private_key, vapid_claims=claims)
+                except WebPushException:
+                    print("Endpoint not registered! Removing")
+                    device.delete()
+            card_notification.delete()
+
+    return HttpResponse("OK")
+
+
+class UserCardNotificationViewSet(viewsets.ModelViewSet):
+    resource_name = 'userCardNotifications'
+    queryset = UserCardNotification.objects.all()
+    serializer_class = UserCardNotificationSerializer
+    pagination_class = None
+
+    def get_queryset(self):
+        query = self.queryset
+        user = self.request.user
+        if 'filter[card_id]' in self.request.query_params:
+            card_id = self.request.query_params['filter[card_id]']
+            query = query.filter(card_id=card_id, user=user)
+
+        return query
+
+    def create(self, request, *args, **kwargs):
+        new_data = request.data
+
+        new_data['user'] = request.user.id
+        new_data['card'] = new_data['card']['id']
+
+        serializer = self.get_serializer(data=new_data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -304,9 +384,10 @@ class CardViewSet(viewsets.ModelViewSet):
         new_data['calendar_date_start'] = None
         new_data['calendar_date_end'] = None
 
+        self.increment_order_for_new_category(category, order_in_category)
         # increment order for cards in new category
-        Card.objects.filter(category_id=category, order_in_category__gte=order_in_category) \
-            .update(order_in_category=F('order_in_category') + 1)
+        #Card.objects.filter(category_id=category, order_in_category__gte=order_in_category) \
+        #    .update(order_in_category=F('order_in_category') + 1)
 
         serializer = self.get_serializer(data=new_data)
         serializer.is_valid(raise_exception=True)

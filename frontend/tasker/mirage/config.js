@@ -1,11 +1,11 @@
 import Response from "ember-cli-mirage/response";
 export default function() {
-this.get('/cards');
+
 this.get('/cards/:id');
 this.post('/cards');
 this.del('/cards/:id');
 this.patch('/cards/:id');
-this.get('/categories');
+
 this.get('/categories/:id');
 this.post('/categories');
 this.del('/categories/:id');
@@ -46,7 +46,7 @@ this.patch('/projects/:id');
   */
   this.post('/api-auth-token/', (db, request) => {
     let attrs = JSON.parse(request.requestBody);
-    if (attrs.username === 'goodusername' && attrs.password === 'goodpassword') {
+    if (attrs.username == 'goodusername' && attrs.password == 'goodpassword') {
       return '{"token": "e5d92c005934e4034b8335e03ee836fae4ceecfd"}';
     } else {
       return new Response(400,
@@ -56,4 +56,32 @@ this.patch('/projects/:id');
     }
 
   });
+  this.get('/api/projects/:id');
+  this.get('/api/projects', (db) => {
+    return db.projects.all();
+  });
+  this.post('/api/projects');
+  this.del('/api/projects/:id');
+
+  this.get('/api/permissions', (db) => {
+    return db.permissions.all();
+  });
+  this.get('/api/permissions/:id');
+  this.post('/api-has-permission/', () => {
+    return new Response(200, {'Content-Type': 'text/html'}, "True");
+  });
+
+  this.get('/api/categories', (db) => {
+    return db.categories.all();
+  });
+
+  this.get('/api/user-project-permissions');
+  this.post('/api/user-project-permissions');
+  this.get('/api/users');
+
+  this.get('/api/cards');
+
+  this.get('/api/priorities');
+
+  this.get('/api/user-card-notifications');
 }

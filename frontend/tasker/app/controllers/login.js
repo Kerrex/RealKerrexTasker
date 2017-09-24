@@ -40,7 +40,7 @@ export default Ember.Controller.extend({
         password = '';
         confirmPassword = '';
       }, (xhr/*, status, error*/) => {
-        console.log(JSON.parse(xhr.responseText));
+        //console.log(JSON.parse(xhr.responseText));
         this.set('error', JSON.parse(xhr.responseText));
       });
     },

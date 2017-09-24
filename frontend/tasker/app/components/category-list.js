@@ -38,7 +38,7 @@ export default Ember.Component.extend({
           $this.find('.ember-list-element').each(function (cat_index) {
 
             let categoryId = Ember.$(this).attr('data-category-id');
-            Ember.$(this).find('.cardList li').each(function (card_index) {
+            Ember.$(this).find('.cardList .card').each(function (card_index) {
 
               if (Ember.$(this).attr('data-card-id') === cardId) {
                 let category = store.find('category', categoryId).then(function (category) {
@@ -83,11 +83,17 @@ export default Ember.Component.extend({
       }
     });
     this.set('addNewCategoryDialog', dialog);
+
+    let sumOfWidth = 100;
+    Ember.$('.category-list-element').each(function(category) {
+      console.log(Ember.$(this));
+      sumOfWidth += Ember.$(this).outerWidth();
+    });
+    Ember.$('.category-list').css('width', sumOfWidth)
   },
 
   actions: {
     showAddNewCategoryDialog() {
-      alert("showing!");
       this.get('addNewCategoryDialog').dialog("open");
     },
 
@@ -97,7 +103,9 @@ export default Ember.Component.extend({
         project: this.get('project')
       });
       newCategory.save();
-      location.reload();
+      if (!Ember.testing) {
+        location.reload();
+      }
       this.get('addNewCategoryDialog').dialog('close');
     },
     reloadModel() {

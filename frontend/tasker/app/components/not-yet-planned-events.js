@@ -16,7 +16,7 @@ export default Ember.Component.extend({
           calendarDateStart: null
         }
       }).then(function (cards) {
-        console.log(cards);
+        //console.log(cards);
         that.set('cards', cards);
       });
     });
@@ -24,7 +24,7 @@ export default Ember.Component.extend({
 
   didRender() {
     Ember.$('.external-events').each(function () {
-      console.log(this);
+      //console.log(this);
       Ember.$(this).data('event', {
         title: Ember.$.trim(Ember.$(this).text()), // use the element's text as the event title
         stick: true // maintain when user navigates (see docs on the renderEvent method)

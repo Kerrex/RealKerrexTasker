@@ -19,6 +19,10 @@ Router.map(function() {
     this.route('show', {
       path: ':projectId'
     });
+
+    this.route('delete', {
+      path: ':project_id/delete'
+    });
   });
   this.route('permissions', function() {
     this.route('new');

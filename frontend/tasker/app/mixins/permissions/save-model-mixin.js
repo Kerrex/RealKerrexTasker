@@ -7,7 +7,7 @@ export default Ember.Mixin.create({
       this.currentModel.save().then(function() {
         route.transitionTo('permissions');
       }, function() {
-        console.log('Failed to save the model');
+        //console.log('Failed to save the model');
       });
     },
 

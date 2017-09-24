@@ -18,7 +18,6 @@ export default Ember.Component.extend({
       alert(response);
       that.set('hasEditPermission', response == 'True')
     }, function(xhr/*, status, error*/) {
-      console.log(xhr);
       that.set('hasEditPermission', xhr.status === 200)
     });
   }),
@@ -29,7 +28,7 @@ export default Ember.Component.extend({
       card.set('calendarDateEnd', Ember.Date.parse(endDate));
 
       card.save();
-      console.log(`Card ${cardId}, startDate: ${Ember.Date.parse(startDate)}, endDate: ${Ember.Date.parse(endDate)}`);
+      //console.log(`Card ${cardId}, startDate: ${Ember.Date.parse(startDate)}, endDate: ${Ember.Date.parse(endDate)}`);
     });
 
   },
@@ -55,7 +54,7 @@ export default Ember.Component.extend({
             end: x.get('calendarDateEnd')
           };
         });
-        console.log(eventArray);
+        //console.log(eventArray);
 
         let calendar = Ember.$('#board-calendar-modal-content .modal-body');
         calendar.fullCalendar('removeEvents');
@@ -71,7 +70,6 @@ export default Ember.Component.extend({
     this.$('#board-calendar-modal-content .modal-body').fullCalendar({
       schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
       droppable: true,
-      timezone: "local",
       defaultView: 'agendaWeek',
       editable: true,
       dropAccept: '.not-planned-calendar-event',

@@ -5,14 +5,14 @@ export default Ember.Controller.extend({
   actions: {
     selectPermission(value) {
       this.store.findRecord('permission', value).then(permission => {
-        console.log(permission);
+        //console.log(permission);
         this.get('project').set('defaultPermission', permission);
       });
     },
 
     selectUserPermission(userPermission, value) {
-      console.log(userPermission);
-      console.log(value);
+      //console.log(userPermission);
+      //console.log(value);
       /*this.store.findRecord('permission', value).then(permission => {
         userPermission.set('permission', permission);
       });*/
@@ -29,17 +29,27 @@ export default Ember.Controller.extend({
         }
       }).then(user => {
         if (!Ember.isEmpty(user)) {
-          console.log(user.get('firstObject'));
+          //console.log(user.get('firstObject'));
           let newUserPermission = this.store.createRecord('user-project-permission', {
             user: user.get('firstObject'),
             project: this.get('project')
           });
           newUserPermission.save();
-          window.location.reload();
+          if (!Ember.testing) {
+            window.location.reload();
+          }
         } else {
           alert("User not found!");
         }
       });
+    },
+    removeProject() {
+      let answer = confirm('Are you sure you want to DELETE this project COMPLETELY?');
+      if (answer) {
+        this.get('project').deleteRecord();
+        this.get('project').save();
+        this.transitionToRoute('projects.index');
+      }
     }
   }
 });

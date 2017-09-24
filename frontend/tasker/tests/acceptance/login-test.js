@@ -39,6 +39,6 @@ test('logging in with wrong creds', (assert) => {
   andThen(() => {
     assert.equal(currentURL(), '/login');
     let $errors = find('#errors').html();
-    assert.equal(JSON.parse($errors).status, '400');
+    assert.notEqual($errors, '');
   });
 });

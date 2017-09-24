@@ -1,6 +1,14 @@
 body {
   background-color: rgb(0, 121, 191);
 }
+html, body {
+  height: 100%;
+}
+
+.category-list-parent {
+  overflow-x: scroll;
+  height: -webkit-fill-available;
+}
 
 .navbar-collapse, .navbar-header, .navbar-brand, .container-fluid {
   background-color: #026AA7;
@@ -28,6 +36,7 @@ body {
 
 .category-list {
   border: none;
+  overflow-x: hidden;
 }
 
 ui-widget-header,
