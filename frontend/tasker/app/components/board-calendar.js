@@ -23,7 +23,7 @@ export default Ember.Component.extend({
   }),
 
   updateCardDate(that, cardId, startDate, endDate) {
-    let card = that.get('store').findRecord('card', cardId).then(function (card) {
+    that.get('store').findRecord('card', cardId).then(function (card) {
       card.set('calendarDateStart', Ember.Date.parse(startDate));
       card.set('calendarDateEnd', Ember.Date.parse(endDate));
 
@@ -38,7 +38,7 @@ export default Ember.Component.extend({
     let projectId = that.get('project.id');
     store.query('category', {filter: {project_id: projectId}}).then(function (categories) {
       let categoryIds = categories.map(x => x.get('id'));
-      let cards = that.get('store').query('card', {
+      that.get('store').query('card', {
         filter: {
           category_id: categoryIds,
           showOnCalendar: true,

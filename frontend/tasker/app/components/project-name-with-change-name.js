@@ -15,10 +15,8 @@ export default Ember.Component.extend({
       contentType: 'application/json;charset=utf-8',
       dataType: 'json'
     }).then(function (response) {
-      alert(response);
       that.set('hasEditPermission', response == 'True')
     }, function (xhr/*, status, error*/) {
-      //console.log(xhr);
       that.set('hasEditPermission', xhr.status === 200)
     });
   }),
@@ -26,7 +24,6 @@ export default Ember.Component.extend({
   didRender() {
     let oldName = this.get('project').get('name');
     let project = this.get('project');
-    let actions = this.get('actions');
     let dialog = Ember.$("#dialog-form").dialog({
       autoOpen: false,
       height: 100,

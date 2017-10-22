@@ -17,7 +17,6 @@ export default Ember.Component.extend({
       alert(response);
       that.set('hasEditPermission', response == 'True')
     }, function (xhr/*, status, error*/) {
-      console.log(xhr);
       that.set('hasEditPermission', xhr.status === 200)
     });
   }),
@@ -32,22 +31,19 @@ export default Ember.Component.extend({
       dropOnEmpty: true,
       update: function (event, ui) {
         let cardId = ui.item.find('li').attr('data-card-id');
-        console.log(`Dragged item has id ${cardId}`);
 
-        let card = store.find('card', cardId).then(function (card) {
-          $this.find('.ember-list-element').each(function (cat_index) {
+        store.find('card', cardId).then(function (card) {
+          $this.find('.ember-list-element').each(function () {
 
             let categoryId = Ember.$(this).attr('data-category-id');
             Ember.$(this).find('.cardList .card').each(function (card_index) {
 
               if (Ember.$(this).attr('data-card-id') === cardId) {
-                let category = store.find('category', categoryId).then(function (category) {
+                store.find('category', categoryId).then(function (category) {
                   if (card.get('category') !== category
                     || card.get('orderInCategory') !== card_index) {
                     card.set('category', category);
                     card.set('orderInCategory', card_index);
-                    console.log("Dragged to category " + category.get('id'));
-                    console.log("Order in category: " + card_index);
                     card.save();
                   }
                 });
@@ -60,6 +56,7 @@ export default Ember.Component.extend({
   },
 
   didRender() {
+    let that = this;
     let dialog = Ember.$("#addNewCategoryDialog").dialog({
       autoOpen: false,
       height: 100,
@@ -85,8 +82,7 @@ export default Ember.Component.extend({
     this.set('addNewCategoryDialog', dialog);
 
     let sumOfWidth = 100;
-    Ember.$('.category-list-element').each(function(category) {
-      console.log(Ember.$(this));
+    Ember.$('.category-list-element').each(function() {
       sumOfWidth += Ember.$(this).outerWidth();
     });
     Ember.$('.category-list').css('width', sumOfWidth)

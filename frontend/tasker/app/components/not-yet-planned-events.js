@@ -9,7 +9,7 @@ export default Ember.Component.extend({
     let projectId = this.get('project.id');
     store.query('category', {filter: {project_id: projectId}}).then(function (categories) {
       let categoryIds = categories.map(x => x.get('id'));
-      let cards = that.get('store').query('card', {
+      that.get('store').query('card', {
         filter: {
           category_id: categoryIds,
           showOnCalendar: true,

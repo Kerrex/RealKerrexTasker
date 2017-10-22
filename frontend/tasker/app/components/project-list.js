@@ -4,6 +4,7 @@ export default Ember.Component.extend({
 
   didInsertElement() {
     let $this = this.$();
+    let $ = Ember.$;
     $this.tooltip({
       position: {
         my: "center bottom-20",

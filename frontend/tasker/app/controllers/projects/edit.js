@@ -10,13 +10,6 @@ export default Ember.Controller.extend({
       });
     },
 
-    selectUserPermission(userPermission, value) {
-      //console.log(userPermission);
-      //console.log(value);
-      /*this.store.findRecord('permission', value).then(permission => {
-        userPermission.set('permission', permission);
-      });*/
-    },
     openAddPermissionModal() {
       let modal = Ember.$('#add-edit-permission-modal');
       modal.css('display', 'block');

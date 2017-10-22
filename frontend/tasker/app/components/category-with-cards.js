@@ -16,7 +16,6 @@ export default Ember.Component.extend({
       alert(response);
       that.set('hasEditPermission', response == 'True')
     }, function (xhr/*, status, error*/) {
-      console.log(xhr);
       that.set('hasEditPermission', xhr.status === 200)
     });
   }),
@@ -40,7 +39,6 @@ export default Ember.Component.extend({
     let category = this.get('category');
     let that = this;
     let store = this.get('store');
-    console.log(this.get('insertElementDialogId'));
     let dialog = Ember.$("#" + this.get('insertElementDialogId')).dialog({
       autoOpen: false,
       height: 100,

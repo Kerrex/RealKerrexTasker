@@ -1,7 +1,7 @@
 import DS from 'ember-data';
 
 export default DS.JSONAPISerializer.extend({
-  serialize(snapshot, options) {
+  serialize(/* snapshot, options */) {
     let json = this._super(...arguments);
     var relationshipObject = json.data.relationships;
     //json.data.relationships.owner.data.type = json.data.relationships.owner.data.type.capitalize();

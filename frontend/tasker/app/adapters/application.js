@@ -7,19 +7,19 @@ export default DS.JSONAPIAdapter.extend(DataAdapterMixin, {
   namespace: 'api',
   authorizer: 'authorizer:drf-token-authorizer',
 
-  shouldReloadRecord: function (store, snapshot) {
+  shouldReloadRecord: function () {
     return true;
   },
 
-  shouldReloadAll: function (store, snapshot) {
+  shouldReloadAll: function () {
     return true;
   },
 
-  shouldBackgroundReloadRecord: function (store, snapshot) {
+  shouldBackgroundReloadRecord: function () {
     return true;
   },
 
-  shouldBackgroundReloadAll: function (store, snapshot) {
+  shouldBackgroundReloadAll: function () {
     return true;
   }
 });

@@ -7,7 +7,7 @@ export default Ember.Mixin.create({
       this.currentModel.save().then(function() {
         route.transitionTo('categories');
       }, function() {
-        console.log('Failed to save the model');
+        /* Do nothing */
       });
     },
 

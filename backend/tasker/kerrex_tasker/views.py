@@ -18,8 +18,10 @@ from rest_framework.response import Response
 from kerrex_tasker.forms import RegistrationForm
 from kerrex_tasker.models import Project, Permission, Category, Card, UserProjectPermission, Priority, UserNotification, \
     UserCardNotification
+from kerrex_tasker.permissions import has_permissions, is_user_blocked, allowed_by_default_permission
 from kerrex_tasker.serializers import ProjectSerializer, PermissionSerializer, UserSerializer, CategorySerializer, \
     CardSerializer, UserProjectPermissionSerializer, PrioritySerializer, UserCardNotificationSerializer
+from kerrex_tasker.services.WebPushService import WebPushService
 
 
 @require_http_methods(["POST"])
@@ -51,26 +53,20 @@ def register(request):
 def has_permission(request):
     project_id = request.body
 
-    project = Project.objects.get(id=project_id)
-    has_permissions = UserProjectPermission.objects.filter(
-        Q(project_id=project_id) & Q(user_id=request.user.id) & (Q(permission_id=1) | Q(permission_id=3))).exists()
-
-    is_user_blocked = UserProjectPermission.objects.filter(project_id=project_id, user_id=request.user.id,
-                                                           permission_id=4)
-    default_permission_allows = project.default_permission_id == 1 or project.default_permission_id == 3
-    print(default_permission_allows)
-    if project.owner.id == request.user.id or (
-                default_permission_allows and not is_user_blocked) or has_permissions:
-        print(True)
+    if has_permissions(project_id, request.user):
         return HttpResponse('True')
     else:
         return HttpResponseForbidden('False')
 
 
+# TODO do przetestowania ta metodka
 @require_http_methods(["POST"])
 @csrf_exempt
 def register_service_worker(request):
     json_body = json.loads(request.body)
+    if 'token' not in json_body or 'subscription_id' not in json_body:
+        return JsonResponse({"error": "Unable to parse request body"}, status=400)
+
     user = Token.objects.filter(key=json_body['token']).first().user
 
     existing_subscription = UserNotification.objects.filter(user=user,
@@ -86,31 +82,19 @@ def register_service_worker(request):
 
     return HttpResponse('OK')
 
-
+# TODO w pierwszej kolejności: do podzielenia i przetestowania ta metodka, webpush wydzielić do serwisu, żeby zamockować
 @require_http_methods(["POST"])
 @csrf_exempt
 def notify(request):
     for card_notification in UserCardNotification.objects.all():
-        now = timezone.now()
-        card = card_notification.card
         user = card_notification.user
-        minutes_before_start = datetime.timedelta(minutes=card_notification.minutes_before_start)
-        date_start = card.calendar_date_start
-
-        if date_start is None:
-            continue
-
-        if (now + minutes_before_start) > card.calendar_date_start or card.calendar_date_start < now:
+        push_service = WebPushService()
+        if push_service.is_eliglble_for_push(card_notification):
             user_notification_devices = UserNotification.objects.filter(user=user)
+
             for device in user_notification_devices:
-                subscription_info = json.loads(device.subscription_id)
-                data = "{} starts in {} minutes!".format(card.name, card_notification.minutes_before_start)
-                private_key = "nhUMvSrk-65JBY8ExLPvnGnLD_JrtWeSTxgdfJxsnd0"
-                claims = {"sub": "mailto:romen3@gmail.com"}
-                try:
-                    webpush(subscription_info, data, vapid_private_key=private_key, vapid_claims=claims)
-                except WebPushException:
-                    print("Endpoint not registered! Removing")
+                result = push_service.send_push(device.subscription_id, card_notification)
+                if not result:
                     device.delete()
             card_notification.delete()
 
@@ -145,6 +129,7 @@ class UserCardNotificationViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
+#TODO może te queriesy wydzielić do permissions.py, żeby był porządek
 class ProjectViewSet(viewsets.ModelViewSet):
     resource_name = 'projects'
     queryset = Project.objects.all()
@@ -252,7 +237,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
             project_id = self.request.query_params['filter[project_id]']
             query = query.filter(project=project_id)
 
-        # TODO dopisać resztę filtrowania
+        # TODO dopisać resztę filtrowania, pr. 3
         return query.order_by('order_in_project')
 
     def create(self, request, *args, **kwargs):
@@ -271,7 +256,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-
+# TODO filtrowanka wydzielić do oddzielnej klasy z jakimiś stałymi, itd
 class CardViewSet(viewsets.ModelViewSet):
     resource_name = 'cards'
     queryset = Card.objects.all()
@@ -345,21 +330,24 @@ class CardViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
-    def decrement_order_for_old_category(self, old_category, old_order_in_category):
+    @staticmethod
+    def decrement_order_for_old_category(old_category, old_order_in_category):
         cards = Card.objects.filter(category_id=old_category, order_in_category__gt=old_order_in_category) \
             .order_by('order_in_category')
         for card in cards:
             card.order_in_category = card.order_in_category - 1
             card.save()
 
-    def increment_order_for_new_category(self, category, order_in_category):
+    @staticmethod
+    def increment_order_for_new_category(category, order_in_category):
         cards = Card.objects.filter(category_id=category, order_in_category__gte=order_in_category) \
             .order_by('-order_in_category')
         for card in cards:
             card.order_in_category = card.order_in_category + 1
             card.save()
 
-    def move_in_same_category(self, card_to_update, category, old_order_in_category, order_in_category):
+    @staticmethod
+    def move_in_same_category(card_to_update, category, old_order_in_category, order_in_category):
         card_to_update.order_in_category = -1
         card_to_update.save()
         is_raising = order_in_category > old_order_in_category

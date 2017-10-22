@@ -1,25 +1,22 @@
 import Ember from 'ember';
 import { module, test } from 'qunit';
 import startApp from '../helpers/start-app';
-import { currentSession, authenticateSession, invalidateSession } from 'tasker/tests/helpers/ember-simple-auth';
+import {authenticateSession} from 'tasker/tests/helpers/ember-simple-auth';
 
 var application;
 var originalConfirm;
-var confirmCalledWith;
 
 module('Acceptance: Project', {
   beforeEach: function() {
     application = startApp();
     originalConfirm = window.confirm;
     window.confirm = function() {
-      confirmCalledWith = [].slice.call(arguments);
       return true;
     };
   },
   afterEach: function() {
     Ember.run(application, 'destroy');
     window.confirm = originalConfirm;
-    confirmCalledWith = null;
   }
 });
 

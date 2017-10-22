@@ -23,8 +23,6 @@ export default Ember.Component.extend({
   },
 
   updateServer(self, subscription) {
-    let subscriptionId = subscription.endpoint.split('/').slice(-1);
-
     Ember.$.ajax({
       url: ENV.host + '/api-register-service-worker/',
       type: 'POST',
@@ -37,7 +35,7 @@ export default Ember.Component.extend({
     }).then((response) => {
       alert('sent!');
       if (response != "OK") {
-        console.error("Error while subscribing!");
+        /* Do nothing here */
       }
     }, (xhr/*, status, error*/) => {
       let response = xhr.responseText;
@@ -56,13 +54,11 @@ export default Ember.Component.extend({
         //console.log('Service worker is registered: ', registration);
         this.set('swRegistration', registration);
         this.send('subscribeSw');
-      }).catch((error) => {
-        console.error('Service Worker Error', error);
+      }).catch((/*error*/) => {
         this.set('isServiceWorkerUnsupported', true);
       });
     } else {
       this.set('isServiceWorkerUnsupported', true);
-      console.warn('Push messaging not supported');
     }
   },
 
@@ -76,8 +72,8 @@ export default Ember.Component.extend({
         //console.log("User is subscribed!");
         //console.log(JSON.stringify(subscription));
         this.get('updateServer')(this, subscription);
-      }).catch((error) => {
-        console.error("Failed to subscribe the user!", error);
+      }).catch((/* error */) => {
+        /* Do nothing */
       });
       this.get('swRegistration').pushManager.getSubscription().then((subscription) => {
         this.set('isSubscribed', !(subscription === null));

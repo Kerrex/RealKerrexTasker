@@ -39,7 +39,7 @@ export default Ember.Component.extend({
   }),
 
   showOnCalendar: Ember.computed('card', {
-    get(key) {
+    get() {
       return this.get('card.showOnCalendar');
     },
     set(key, value) {
@@ -50,7 +50,7 @@ export default Ember.Component.extend({
   }),
 
   cardName: Ember.computed('card', {
-    get(key) {
+    get() {
       return this.get('card').get('name');
     },
     set(key, value) {
@@ -59,7 +59,7 @@ export default Ember.Component.extend({
   }),
 
   cardDescription: Ember.computed('card', {
-    get(key) {
+    get() {
       return this.get('card').get('description');
     },
     set(key, value) {
