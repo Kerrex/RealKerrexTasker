@@ -6,7 +6,7 @@ from rest_framework.routers import DefaultRouter
 
 from kerrex_tasker.views import register, ProjectViewSet, PermissionViewSet, UserViewSet, CardViewSet, CategoryViewSet, \
     UserProjectPermissionViewSet, has_permission, PriorityViewSet, UserCardNotificationViewSet, register_service_worker, \
-    notify
+    NotifyView
 
 router = routers.DefaultRouter(trailing_slash=False)
 router.register('projects', ProjectViewSet)
@@ -24,5 +24,5 @@ urlpatterns = [
     url(r'^api/', include(router.urls)),
     url(r'^api-has-permission/', has_permission),
     url(r'^api-register-service-worker/', register_service_worker),
-    url(r'^api-notify/', notify)
+    url(r'^api-notify/', NotifyView.as_view())
 ]

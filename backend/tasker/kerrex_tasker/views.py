@@ -8,6 +8,7 @@ from django.http import JsonResponse, HttpResponse, Http404, HttpResponseForbidd
 from django.utils import timezone
 
 # Create your views here.
+from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from pywebpush import webpush, WebPushException
@@ -15,13 +16,14 @@ from rest_framework import status, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 
+from kerrex_tasker.filters import UserCardNotificationFilter
 from kerrex_tasker.forms import RegistrationForm
 from kerrex_tasker.models import Project, Permission, Category, Card, UserProjectPermission, Priority, UserNotification, \
     UserCardNotification
 from kerrex_tasker.permissions import has_permissions, is_user_blocked, allowed_by_default_permission
 from kerrex_tasker.serializers import ProjectSerializer, PermissionSerializer, UserSerializer, CategorySerializer, \
     CardSerializer, UserProjectPermissionSerializer, PrioritySerializer, UserCardNotificationSerializer
-from kerrex_tasker.services.WebPushService import WebPushService
+from kerrex_tasker.services.web_push_service import WebPushService
 
 
 @require_http_methods(["POST"])
@@ -82,25 +84,27 @@ def register_service_worker(request):
 
     return HttpResponse('OK')
 
-# TODO w pierwszej kolejności: do podzielenia i przetestowania ta metodka, webpush wydzielić do serwisu, żeby zamockować
-@require_http_methods(["POST"])
-@csrf_exempt
-def notify(request):
-    for card_notification in UserCardNotification.objects.all():
-        user = card_notification.user
-        push_service = WebPushService()
-        if push_service.is_eliglble_for_push(card_notification):
-            user_notification_devices = UserNotification.objects.filter(user=user)
 
-            for device in user_notification_devices:
-                result = push_service.send_push(device.subscription_id, card_notification)
-                if not result:
-                    device.delete()
-            card_notification.delete()
+class NotifyView(View):
+    push_service = WebPushService()
 
-    return HttpResponse("OK")
+    @csrf_exempt
+    def post(self, request):
+        for card_notification in UserCardNotification.objects.all():
+            user = card_notification.user
+            if self.push_service.is_eliglble_for_push(card_notification):
+                user_notification_devices = UserNotification.objects.filter(user=user)
+
+                for device in user_notification_devices:
+                    result = self.push_service.send_push(device.subscription_id, card_notification)
+                    if not result:
+                        device.delete()
+                card_notification.delete()
+
+        return HttpResponse("OK")
 
 
+# TODO do przetestowania w następnej kolejności
 class UserCardNotificationViewSet(viewsets.ModelViewSet):
     resource_name = 'userCardNotifications'
     queryset = UserCardNotification.objects.all()
@@ -108,13 +112,8 @@ class UserCardNotificationViewSet(viewsets.ModelViewSet):
     pagination_class = None
 
     def get_queryset(self):
-        query = self.queryset
-        user = self.request.user
-        if 'filter[card_id]' in self.request.query_params:
-            card_id = self.request.query_params['filter[card_id]']
-            query = query.filter(card_id=card_id, user=user)
-
-        return query
+        query_filter = UserCardNotificationFilter(self.queryset, self.request.user)
+        return query_filter.filter(self.request.query_params)
 
     def create(self, request, *args, **kwargs):
         new_data = request.data
