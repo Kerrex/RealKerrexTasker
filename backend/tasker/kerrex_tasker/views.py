@@ -16,11 +16,12 @@ from rest_framework import status, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 
-from kerrex_tasker.filters import UserCardNotificationFilter
+from kerrex_tasker.filters import UserCardNotificationFilter, UserFilter, CategoryFilter
 from kerrex_tasker.forms import RegistrationForm
 from kerrex_tasker.models import Project, Permission, Category, Card, UserProjectPermission, Priority, UserNotification, \
     UserCardNotification
-from kerrex_tasker.permissions import has_permissions, is_user_blocked, allowed_by_default_permission
+from kerrex_tasker.permissions import has_permissions, is_user_blocked, allowed_by_default_permission, \
+    get_filter_params_for_available_project_query, has_permission_to_edit
 from kerrex_tasker.serializers import ProjectSerializer, PermissionSerializer, UserSerializer, CategorySerializer, \
     CardSerializer, UserProjectPermissionSerializer, PrioritySerializer, UserCardNotificationSerializer
 from kerrex_tasker.services.web_push_service import WebPushService
@@ -54,14 +55,15 @@ def register(request):
 @csrf_exempt
 def has_permission(request):
     project_id = request.body
-
-    if has_permissions(project_id, request.user):
+    token = request.META['HTTP_AUTHORIZATION'].replace('Token ', '')
+    user = Token.objects.filter(key=token).first().user
+    project = Project.objects.get(pk=project_id)
+    if has_permission_to_edit(project, user):
         return HttpResponse('True')
     else:
         return HttpResponseForbidden('False')
 
 
-# TODO do przetestowania ta metodka
 @require_http_methods(["POST"])
 @csrf_exempt
 def register_service_worker(request):
@@ -128,7 +130,6 @@ class UserCardNotificationViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
-#TODO może te queriesy wydzielić do permissions.py, żeby był porządek
 class ProjectViewSet(viewsets.ModelViewSet):
     resource_name = 'projects'
     queryset = Project.objects.all()
@@ -137,10 +138,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         user = self.request.user
-        queryset = self.filter_queryset(self.get_queryset()).filter(Q(owner=user)
-                                                                    | (Q(userprojectpermission__user=user)
-                                                                       & Q(
-            userprojectpermission__permission_id__in=[1, 3])))
+        queryset = self.filter_queryset(self.get_queryset()).filter(get_filter_params_for_available_project_query(user))
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -153,15 +151,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
 
-        has_permissions = UserProjectPermission.objects.filter(
-            Q(project=instance) & Q(user_id=request.user.id) & (Q(permission_id=1) | Q(permission_id=3))).exists()
-
-        is_user_blocked = UserProjectPermission.objects.filter(project=instance, user_id=request.user.id,
-                                                               permission_id=4)
-        default_permission_allows = instance.default_permission_id == 1 or instance.default_permission_id == 3
-        print(default_permission_allows)
-        if instance.owner.id == request.user.id or (
-                    default_permission_allows and not is_user_blocked) or has_permissions:
+        if has_permissions(instance.id, request.user):
             serializer = self.get_serializer(instance)
             return Response(serializer.data)
         else:
@@ -184,13 +174,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        default_edit_permission = instance.default_permission_id == 1
-        is_blocked = UserProjectPermission.objects.filter(project=instance, user_id=request.user.id,
-                                                          permission_id=4).exists()
-        has_permission_to_edit = UserProjectPermission.objects.filter(project=instance, user_id=request.user.id,
-                                                                      permission_id=1).exists()
-        if (not default_edit_permission and not has_permission_to_edit) or (default_edit_permission and is_blocked):
-            return HttpResponseForbidden("No permission to edit that project");
+
+        if not has_permission_to_edit(instance, request.user):
+            return HttpResponseForbidden("No permission to edit that project")
 
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
@@ -216,12 +202,8 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
     def get_queryset(self):
-        query = self.queryset
-        if 'filter[usernameOrEmail]' in self.request.query_params:
-            username_or_email = self.request.query_params['filter[usernameOrEmail]']
-            query = query.filter(Q(username=username_or_email) | Q(email=username_or_email))
-
-        return query
+        user_filter = UserFilter(self.queryset)
+        return user_filter.filter(self.request.query_params)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -232,9 +214,8 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         query = self.queryset
-        if 'filter[project_id]' in self.request.query_params:
-            project_id = self.request.query_params['filter[project_id]']
-            query = query.filter(project=project_id)
+        cat_filter = CategoryFilter(query)
+        query = cat_filter.filter(self.request.query_params)
 
         # TODO dopisać resztę filtrowania, pr. 3
         return query.order_by('order_in_project')

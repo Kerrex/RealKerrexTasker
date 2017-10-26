@@ -3,14 +3,19 @@ import ENV from 'tasker/config/environment';
 
 export default Ember.Component.extend({
   store: Ember.inject.service(),
+  session: Ember.inject.service(),
   changeNameDialog: null,
   projectName: Ember.computed.alias('project.name'),
 
   hasEditPermission: Ember.computed('store', function () {
     let that = this;
+    let token = this.get('session.data').authenticated.token;
     Ember.$.ajax({
       url: ENV.host + '/api-has-permission/',
       type: 'POST',
+      headers: {
+        'Authorization': 'Token ' + token
+      },
       data: that.get('project.id'),
       contentType: 'application/json;charset=utf-8',
       dataType: 'json'

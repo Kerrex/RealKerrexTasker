@@ -112,15 +112,18 @@ export default Ember.Component.extend({
                   card: that.get('card'),
                   minutesBeforeStart: minutes
                 });
-                newNotification.save();
-                that.get('notifications');
-                window.location.reload();
-                that.rerender();
+                newNotification.save().then(function() {
+                  that.get('notifications');
+                  window.location.reload();
+                  that.rerender();
+                });
+                
               } else {
                 notification.toArray()[0].set('minutesBeforeStart', minutes);
-                notification.toArray()[0].save();
-                that.get('notifications');
-                window.location.reload();
+                notification.toArray()[0].save().then(function() {
+                  that.get('notifications');
+                  window.location.reload();
+                });
               }
             })
           }
