@@ -16,7 +16,7 @@ from rest_framework import status, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 
-from kerrex_tasker.filters import UserCardNotificationFilter, UserFilter, CategoryFilter
+from kerrex_tasker.filters import UserCardNotificationFilter, UserFilter, CategoryFilter, CardFilter
 from kerrex_tasker.forms import RegistrationForm
 from kerrex_tasker.models import Project, Permission, Category, Card, UserProjectPermission, Priority, UserNotification, \
     UserCardNotification
@@ -217,7 +217,6 @@ class CategoryViewSet(viewsets.ModelViewSet):
         cat_filter = CategoryFilter(query)
         query = cat_filter.filter(self.request.query_params)
 
-        # TODO dopisać resztę filtrowania, pr. 3
         return query.order_by('order_in_project')
 
     def create(self, request, *args, **kwargs):
@@ -244,42 +243,21 @@ class CardViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         query = self.queryset
-        for key in self.request.query_params.keys():
-            print(key)
-        if 'filter[category_id]' in self.request.query_params:
-            category_id = self.request.query_params['filter[category_id]']
-            query = query.filter(category_id=category_id)
+        card_filter = CardFilter(query)
+        return card_filter.filter(query).order_by('order_in_category')
 
-        if 'filter[category_id][]' in self.request.query_params:
-            category_ids = self.request.GET.getlist('filter[category_id][]')
-            query = query.filter(category_id__in=category_ids)
-
-        if 'filter[showOnCalendar]' in self.request.query_params:
-            show_on_calendar = self.request.query_params['filter[showOnCalendar]'] == 'true'
-            query = query.filter(show_on_calendar=show_on_calendar)
-
-        if 'filter[calendarDateStart]' in self.request.query_params:
-            calendar_date_start = self.request.query_params['filter[calendarDateStart]']
-            if calendar_date_start == '':
-                calendar_date_start = None
-            query = query.filter(calendar_date_start=calendar_date_start)
-
-        return query.order_by('order_in_category')
-
+    # TODO Podzielić i to przetestować jakoś
     def update(self, request, *args, **kwargs):
         user = request.user
         print(request.body)
         new_data = request.data
 
         # fix 'got OrderedDict instead of pk error'
-        new_data['created_by'] = new_data['created_by']['id']
-        new_data['modified_by'] = user.id
-        new_data['category'] = new_data['category']['id']
-        new_data['priority'] = new_data['priority']['id'] if new_data['priority'] is not None else None
+        self.fix_got_ordered_dict_instead_of_pk_error(new_data, user)
 
         order_in_category = new_data['order_in_category']
         category = new_data['category']
-        print(new_data)
+
         # sprawdzanie czy order i kategoria się w ogole zmienily
         card_to_update = Card.objects.get(pk=new_data['id'])
         old_category = card_to_update.category_id
@@ -292,10 +270,7 @@ class CardViewSet(viewsets.ModelViewSet):
         elif not changing_category and changing_order:
             self.move_in_same_category(card_to_update, category, old_order_in_category, order_in_category)
 
-        if new_data['calendar_date_start'] == 'Invalid date':
-            new_data['calendar_date_start'] = None
-        if new_data['calendar_date_end'] == 'Invalid date':
-            new_data['calendar_date_end'] = None
+        self.verify_and_correct_dates(new_data)
 
         # perform actual update of card
         partial = kwargs.pop('partial', False)
@@ -309,6 +284,20 @@ class CardViewSet(viewsets.ModelViewSet):
             self.decrement_order_for_old_category(old_category, old_order_in_category)
 
         return Response(serializer.data)
+
+    @staticmethod
+    def verify_and_correct_dates(new_data):
+        if new_data['calendar_date_start'] == 'Invalid date':
+            new_data['calendar_date_start'] = None
+        if new_data['calendar_date_end'] == 'Invalid date':
+            new_data['calendar_date_end'] = None
+
+    @staticmethod
+    def fix_got_ordered_dict_instead_of_pk_error(new_data, user):
+        new_data['created_by'] = new_data['created_by']['id']
+        new_data['modified_by'] = user.id
+        new_data['category'] = new_data['category']['id']
+        new_data['priority'] = new_data['priority']['id'] if new_data['priority'] is not None else None
 
     @staticmethod
     def decrement_order_for_old_category(old_category, old_order_in_category):
@@ -351,6 +340,13 @@ class CardViewSet(viewsets.ModelViewSet):
         new_data['modified_by'] = request.user.id
         new_data['calendar_date_start'] = None
         new_data['calendar_date_end'] = None
+
+        if not Category.objects.filter(id=category).exists():
+            return HttpResponseForbidden('You cant edit that project!!')
+
+        project = Category.objects.get(pk=category).project
+        if not has_permission_to_edit(project, request.user):
+            return HttpResponseForbidden('You cant edit that project!!')
 
         self.increment_order_for_new_category(category, order_in_category)
         # increment order for cards in new category

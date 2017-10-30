@@ -82,8 +82,9 @@ export default Ember.Component.extend({
         category: this.get('category'),
         description: ''
       });
-      newCard.save();
-      location.reload();
+      newCard.save().then(function () {
+        location.reload();
+      });
     },
   }
 });
