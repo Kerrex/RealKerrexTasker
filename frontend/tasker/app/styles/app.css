@@ -12,6 +12,7 @@ body {
 .navbar {
   border-radius: 0px !important;
   border: none !important;
+  padding: 0;
 }
 
 .navbar-inverse {

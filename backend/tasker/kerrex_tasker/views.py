@@ -16,7 +16,8 @@ from rest_framework import status, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 
-from kerrex_tasker.filters import UserCardNotificationFilter, UserFilter, CategoryFilter, CardFilter
+from kerrex_tasker.filters import UserCardNotificationFilter, UserFilter, CategoryFilter, CardFilter, \
+    UserCardPermissionFilter
 from kerrex_tasker.forms import RegistrationForm
 from kerrex_tasker.models import Project, Permission, Category, Card, UserProjectPermission, Priority, UserNotification, \
     UserCardNotification
@@ -367,12 +368,9 @@ class UserProjectPermissionViewSet(viewsets.ModelViewSet):
     pagination_class = None
 
     def get_queryset(self):
-        query = self.queryset
-        if 'filter[project_id]' in self.request.query_params:
-            project_id = self.request.query_params['filter[project_id]']
-            query = query.filter(project_id=project_id)
+        permission_filter = UserCardPermissionFilter(self.queryset)
 
-        return query
+        return permission_filter.filter(self.request.query_params)
 
     def create(self, request, *args, **kwargs):
         new_data = request.data
@@ -381,6 +379,10 @@ class UserProjectPermissionViewSet(viewsets.ModelViewSet):
         new_data['project'] = new_data['project']['id']
         new_data['permission'] = 1
         new_data['given_by'] = request.user.id
+
+        project = Project.objects.get(pk=new_data['project'])
+        if not has_permission_to_edit(project, request.user):
+            return HttpResponseForbidden("No permission to edit that project")
 
         serializer = self.get_serializer(data=new_data)
         serializer.is_valid(raise_exception=True)
@@ -397,6 +399,10 @@ class UserProjectPermissionViewSet(viewsets.ModelViewSet):
 
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
+
+        if not has_permission_to_edit(instance.project, request.user):
+            return HttpResponseForbidden("No permission to edit that project")
+
         serializer = self.get_serializer(instance, data=new_data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)

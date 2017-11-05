@@ -64,7 +64,7 @@ class CardFilter:
 
         # TODO Sprawdzić czy nowa metoda faktycznie działa
         if self.CATEGORY_ID_MANY in query_params:
-            #category_ids = self.request.GET.getlist('filter[category_id][]')
+            # category_ids = self.request.GET.getlist('filter[category_id][]')
             category_ids = query_params.getlist(self.CATEGORY_ID_MANY)
             query = query.filter(category_id__in=category_ids)
 
@@ -75,5 +75,20 @@ class CardFilter:
         if self.CALENDAR_DATE_START in query_params:
             calendar_date_start = query_params[self.CALENDAR_DATE_START]
             query = query.filter(calendar_date_start=calendar_date_start if calendar_date_start != '' else None)
+
+        return query
+
+
+class UserCardPermissionFilter:
+    PROJECT_ID = 'filter[project_id]'
+
+    def __init__(self, queryset: QuerySet):
+        self.queryset = queryset
+
+    def filter(self, query_params):
+        query = self.queryset
+        if self.PROJECT_ID in query_params:
+            project_id = query[self.PROJECT_ID]
+            query = query.filter(project_id=project_id)
 
         return query

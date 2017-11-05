@@ -27,10 +27,11 @@ export default Ember.Controller.extend({
             user: user.get('firstObject'),
             project: this.get('project')
           });
-          newUserPermission.save();
-          if (!Ember.testing) {
-            window.location.reload();
-          }
+          newUserPermission.save().then(function() {
+            if (!Ember.testing) {
+              window.location.reload();
+            }
+          });
         } else {
           alert("User not found!");
         }
