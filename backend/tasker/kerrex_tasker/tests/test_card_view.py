@@ -16,7 +16,7 @@ class CardViewTest(TestCase):
         self.client = APIClient()
         self.client.login(username='someuser', password='password')
 
-    def successfully_update_card_no_order_change(self):
+    def test_successfully_update_card_no_order_change(self):
         request = '{"data":{"id":"1","attributes":{"name":"AfterUpdateCard","description":"",' \
                   '"order_in_category":0,"calendar_date_start":"Invalid date","calendar_date_end":"Invalid date",' \
                   '"show_on_calendar":false},"relationships":{"created_by":{"data":{"type":"Users","id":"1"}},' \
@@ -28,7 +28,7 @@ class CardViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Card.objects.first().name, 'AfterUpdateCard')
 
-    def update_card_change_order_to_higher_in_same_category(self):
+    def test_update_card_change_order_to_higher_in_same_category(self):
         Card(id=2, name='Card2', category_id=1, order_in_category=1, created_by_id=1).save()
         request = '{"data":{"id":"1","attributes":{"name":"Card","description":"",' \
                   '"order_in_category":1,"calendar_date_start":"Invalid date","calendar_date_end":"Invalid date",' \
@@ -42,7 +42,7 @@ class CardViewTest(TestCase):
         self.assertEqual(Card.objects.get(pk=1).order_in_category, 1)
         self.assertEqual(Card.objects.get(pk=2).order_in_category, 0)
 
-    def update_card_change_order_to_lower_in_same_category(self):
+    def test_update_card_change_order_to_lower_in_same_category(self):
         card = Card.objects.first()
         card.order_in_category = 1
         card.save()
@@ -59,7 +59,7 @@ class CardViewTest(TestCase):
         self.assertEqual(Card.objects.get(pk=1).order_in_category, 0)
         self.assertEqual(Card.objects.get(pk=2).order_in_category, 1)
 
-    def update_card_change_category(self):
+    def test_update_card_change_category(self):
         Card(id=2, name='Card2', category_id=1, order_in_category=1, created_by_id=1).save()
         Category(name='Category2', order_in_project=1, project_id=1).save()
         Card(id=3, name='Card3', category_id=2, order_in_category=1, created_by_id=1).save()
@@ -78,7 +78,7 @@ class CardViewTest(TestCase):
         self.assertEqual(len(Card.objects.filter(category_id=1)), 3)
         self.assertEqual(len(Card.objects.filter(category_id=2)), 0)
 
-    def successfully_create_card(self):
+    def test_successfully_create_card(self):
         request = '{"data":{"attributes":{"name":"Nowa karta","description":"","date_created":null,' \
                   '"last_modified":null,"order_in_category":0,"calendar_date_start":"2017-10-30T21:48:31+01:00",' \
                   '"calendar_date_end":"2017-10-30T21:48:31+01:00","show_on_calendar":false},"relationships":{' \
@@ -90,7 +90,7 @@ class CardViewTest(TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(len(Card.objects.all()), 2)
 
-    def create_card_for_nonexistent_category(self):
+    def test_create_card_for_nonexistent_category(self):
         request = '{"data":{"attributes":{"name":"Nowa karta","description":"","date_created":null,' \
                   '"last_modified":null,"order_in_category":0,"calendar_date_start":"2017-10-30T21:48:31+01:00",' \
                   '"calendar_date_end":"2017-10-30T21:48:31+01:00","show_on_calendar":false},"relationships":{' \
@@ -102,7 +102,7 @@ class CardViewTest(TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertEqual(len(Card.objects.all()), 1)
 
-    def create_card_no_permission(self):
+    def test_create_card_no_permission(self):
         project = Project.objects.get(pk=1)
         project.default_permission_id = 3
         project.save()
