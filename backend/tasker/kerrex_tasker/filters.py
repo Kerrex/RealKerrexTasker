@@ -88,7 +88,7 @@ class UserCardPermissionFilter:
     def filter(self, query_params):
         query = self.queryset
         if self.PROJECT_ID in query_params:
-            project_id = query[self.PROJECT_ID]
+            project_id = query_params[self.PROJECT_ID]
             query = query.filter(project_id=project_id)
 
         return query

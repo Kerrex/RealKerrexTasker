@@ -245,7 +245,7 @@ class CardViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         query = self.queryset
         card_filter = CardFilter(query)
-        return card_filter.filter(query).order_by('order_in_category')
+        return card_filter.filter(self.request.query_params).order_by('order_in_category')
 
     # TODO Podzielić i to przetestować jakoś
     def update(self, request, *args, **kwargs):

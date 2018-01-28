@@ -73,9 +73,10 @@ export default Ember.Component.extend({
             name: that.get('newCategoryName'),
             project: that.get('project')
           });
-          newCategory.save();
-          //location.reload();
-          dialog.dialog('close');
+          newCategory.save().then(() => {
+            location.reload();
+            dialog.dialog('close');  
+          });
         },
         Cancel: function () {
           dialog.dialog('close');
