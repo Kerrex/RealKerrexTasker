@@ -1,0 +1,21 @@
+<ul class="category-list">
+  {{#each categories as |cat|}}
+    <li class="category-list-element ember-list-element" data-category-id="{{cat.id}}">{{category-with-cards category=cat}}</li>
+  {{/each}}
+  {{#if hasEditPermission}}
+    <li {{action "showAddNewCategoryDialog"}} class="category-list-element add-new-category">Click here to add new
+      category
+    </li>
+  {{/if}}
+</ul>
+{{#if hasEditPermission}}
+  <div id="addNewCategoryDialog" title="Insert category name">
+    <form {{action 'addNewCategory' on='submit'}}>
+      <fieldset>
+        <label for="cardName">Name</label>
+        {{input name="newCategoryName" value=newCategoryName class="text ui-widget-content ui-corner-all new-category-input"}}
+        <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+      </fieldset>
+    </form>
+  </div>
+{{/if}}

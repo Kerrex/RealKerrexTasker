@@ -1,0 +1,15 @@
+{{#link-to 'projects.show' project.id class="board-tile"}}
+  <div class="col-md-4 col-sm-12">
+    <li class="project-list-element"
+        title="Ostatnia modfyfikacja: {{project.lastModified}} <br/> Utworzono: {{project.dateCreated}}">
+      <span class="project-name">{{project.name}}</span>
+      <span class="project-description">{{project.description}}</span>
+      <span class="project-owner">Właściciel: {{project.owner.username}}</span>
+      {{#if hasEditPermission}}
+        {{#link-to 'projects.edit' project.id class="project-settings"}}
+          <span class="fa fa-cog"></span>
+        {{/link-to}}
+      {{/if}}
+    </li>
+  </div>
+{{/link-to}}

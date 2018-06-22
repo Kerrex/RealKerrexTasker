@@ -1,0 +1,207 @@
+body {
+  background-color: rgb(0, 121, 191);
+}
+html, body {
+  height: 100%;
+}
+
+.category-list-parent {
+  overflow-x: scroll;
+  height: -webkit-fill-available;
+}
+
+.navbar-collapse, .navbar-header, .navbar-brand, .container-fluid {
+  background-color: #026AA7;
+}
+
+.go-to-project-list-button {
+  margin-left: 20px;
+}
+
+.project-name a {
+  color: #ffffff;
+  padding: 5px;
+  margin: 20px;
+}
+
+.project-name {
+  margin-bottom: 20px;
+}
+
+.project-name a:hover {
+  text-decoration: none;
+  border-radius: 3px;
+  background-color: rgba(0, 0, 0, .12);
+}
+
+.category-list {
+  border: none;
+  overflow-x: hidden;
+}
+
+ui-widget-header,
+.ui-state-default,
+ui-button {
+  background: #CCCCCC;
+  border: 1px solid #B8B8B8;
+  color: #000;
+  font-weight: bold;
+}
+
+.ui-dialog {
+  background-color: #fcfcfc;
+  -moz-box-shadow: 0 0 20px #000;
+  -webkit-box-shadow: 0 0 20px #000;
+  border: 1px solid #888;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  -webkit-animation-name: animatecarddialog;
+  -webkit-animation-duration: 0.4s;
+  animation-name: animatecarddialog;
+  animation-duration: 0.4s;
+}
+
+.ui-slate-add-new:hover {
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, .12);
+}
+
+.add-new-category {
+  background-color: #026AA7;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, .12);
+  cursor: pointer;
+  color: white;
+}
+
+.add-new-category:hover {
+  background-color: rgba(0, 0, 0, .20);
+}
+
+.last-modification-details {
+  margin-top: 30px;
+}
+
+.edit-description-textarea {
+  width: 100%;
+}
+
+.edit-name-textarea {
+  width: 100%;
+}
+
+#board-calendar {
+  height: 30%;
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+  from {
+    top: -300px;
+    opacity: 0
+  }
+  to {
+    top: 0;
+    opacity: 1
+  }
+}
+
+@keyframes animatetop {
+  from {
+    top: -300px;
+    opacity: 0
+  }
+  to {
+    top: 0;
+    opacity: 1
+  }
+}
+
+@-webkit-keyframes animatecarddialog {
+  from {
+    opacity: 0
+  }
+  to {
+    opacity: 1
+  }
+}
+
+@keyframes animatecarddialog {
+  from {
+    opacity: 0
+  }
+  to {
+    opacity: 1
+  }
+}
+
+/* The Close Button */
+.close {
+  color: black;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.modal-body {
+  padding: 2px 16px;
+}
+
+.modal-footer {
+  padding: 2px 16px;
+  color: black;
+}
+
+.modal-content {
+  position: relative;
+  background-color: #fefefe;
+  margin: auto;
+  padding: 0;
+  border: 1px solid #888;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  -webkit-animation-name: animatetop;
+  -webkit-animation-duration: 0.4s;
+  animation-name: animatetop;
+  animation-duration: 0.4s;
+}
+
+.modal {
+  margin: auto;
+}
+
+#board-calendar-modal-content {
+
+  width: 80%;
+  height: 90%;
+  overflow-y: scroll;
+}
+
+.show-on-calendar input {
+  margin-left: 10px;
+  margin-top: 2px;
+}
+
+.not-planned-calendar-event {
+  margin: 10px 0 10px 10px;
+  cursor: pointer;
+}
+
+.low-priority {
+  background-color: greenyellow !important;
+}
+
+.medium-priority {
+  background-color: orange !important;
+
+}
+
+.high-priority {
+  background-color: red !important;
+  color: white !important;
+}

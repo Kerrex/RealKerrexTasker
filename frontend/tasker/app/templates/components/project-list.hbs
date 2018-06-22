@@ -1,0 +1,13 @@
+<div class="row">
+    {{#if list.length}}
+      <ul class="project-list">
+        {{#each list as |project|}}
+          {{project-list-tile project=project}}
+        {{/each}}
+      </ul>
+    {{else}}
+      <p id="blankslate" style="display: table; margin: auto; vertical-align: middle">
+        No projects found. Please use button above to add your first one!
+      </p>
+    {{/if}}
+  </div>

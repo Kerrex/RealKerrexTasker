@@ -1,0 +1,17 @@
+
+  <td>{{userPermission.user.username}}</td>
+  <td>{{userPermission.user.email}}</td>
+  <td>
+    <select class="form-control" onchange={{action "selectUserPermission" value="target.value"}}>
+      {{#unless project.defaultPermission}}
+        <option selected>Select from list</option>
+      {{/unless}}
+      {{#each permissions as |permission|}}
+        {{#if (eq userPermission.permission.id permission.id)}}
+          <option value={{permission.id}} selected>{{permission.name}}</option>
+        {{else}}
+          <option value={{permission.id}}>{{permission.name}}</option>
+        {{/if}}
+      {{/each}}
+    </select>
+  </td>

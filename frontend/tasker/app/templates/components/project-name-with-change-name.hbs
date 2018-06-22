@@ -1,0 +1,20 @@
+<h2 class="project-name">
+  {{#if hasEditPermission}}
+    <a {{action "showDialog"}}>{{projectName}}</a>
+  {{else}}
+    <a>{{projectName}}</a>
+  {{/if}}
+</h2>
+
+{{#if hasEditPermission}}
+  <div id="dialog-form" title="Change project name">
+    <form {{action 'changeName' on='submit'}}>
+      <fieldset>
+        <label for="newProjectName">Name</label>
+        {{input name="newProjectName" id="newProjectName" value=project.name class="text ui-widget-content ui-corner-all"}}
+
+        <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+      </fieldset>
+    </form>
+  </div>
+{{/if}}

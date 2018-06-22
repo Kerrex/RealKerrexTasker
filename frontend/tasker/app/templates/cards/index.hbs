@@ -1,0 +1,78 @@
+<h1>Cards list</h1>
+
+<p>
+  {{link-to "New Card" "cards.new" }}
+</p>
+
+{{#if model.length}}
+  <table>
+    <thead>
+      <tr>
+        <th>
+          Name
+        </th>
+        <th>
+          Description
+        </th>
+        <th>
+          Datecreated
+        </th>
+        <th>
+          Lastmodified
+        </th>
+        <th>
+          Createdby
+        </th>
+        <th>
+          Modifiedby
+        </th>
+        <th>
+          Category
+        </th>
+        <th colspan="3">
+          Actions
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each model as |card|}}
+        <tr>
+          <td>
+            {{card.name}}
+          </td>
+          <td>
+            {{card.description}}
+          </td>
+          <td>
+            {{card.dateCreated}}
+          </td>
+          <td>
+            {{card.lastModified}}
+          </td>
+          <td>
+            {{card.createdBy}}
+          </td>
+          <td>
+            {{card.modifiedBy}}
+          </td>
+          <td>
+            {{card.category}}
+          </td>
+          <td>
+            {{link-to "Edit" "cards.edit" card}}
+          </td>
+          <td>
+            {{link-to "Show" "cards.show" card}}
+          </td>
+          <td>
+            <a href="#" {{action "remove" card}}>Remove</a>
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+{{else}}
+  <p id="blankslate">
+    No Cards found
+  </p>
+{{/if}}

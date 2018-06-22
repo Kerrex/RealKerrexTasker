@@ -1,0 +1,54 @@
+<h1>Categories list</h1>
+
+<p>
+  {{link-to "New Category" "categories.new" }}
+</p>
+
+{{#if model.length}}
+  <table>
+    <thead>
+      <tr>
+        <th>
+          Name
+        </th>
+        <th>
+          Order in project
+        </th>
+        <th>
+          Project
+        </th>
+        <th colspan="3">
+          Actions
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each model as |category|}}
+        <tr>
+          <td>
+            {{category.name}}
+          </td>
+          <td>
+            {{category.orderInProject}}
+          </td>
+          <td>
+            {{category.project}}
+          </td>
+          <td>
+            {{link-to "Edit" "categories.edit" category}}
+          </td>
+          <td>
+            {{link-to "Show" "categories.show" category}}
+          </td>
+          <td>
+            <a href="#" {{action "remove" category}}>Remove</a>
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+{{else}}
+  <p id="blankslate">
+    No Categories found
+  </p>
+{{/if}}

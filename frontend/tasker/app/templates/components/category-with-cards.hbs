@@ -1,0 +1,21 @@
+<h2 class="ui-state-disabled">{{category.name}}</h2>
+<ul class="connectedCategory cardList {{categoryClass}}">
+  {{#each cards as |card|}}
+    {{card-with-details-dialog card=card}}
+  {{/each}}
+  <li></li>
+  {{#if hasEditPermission}}
+    <div {{action "showAddNewCardDialog"}} class="not-element ui-slate-add-new" data-category-id="{{category.id}}">Click
+      here to add new card!
+    </div>
+    <div id="{{insertElementDialogId}}" title="Insert card name">
+      <form {{action 'insertNewCard' on='submit'}}>
+        <fieldset>
+          <label for="cardName">Name</label>
+          {{input name="newCardName" value=newCardName class="text ui-widget-content ui-corner-all"}}
+          <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+        </fieldset>
+      </form>
+    </div>
+  {{/if}}
+</ul>

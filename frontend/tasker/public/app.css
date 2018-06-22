@@ -1,0 +1,375 @@
+#login-dp {
+  min-width: 250px;
+  padding: 14px 14px 0;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, .8);
+}
+
+body {
+  font-family: 'Titillium Web', sans-serif;
+}
+
+.navbar {
+  border-radius: 0px !important;
+  border: none !important;
+  padding: 0;
+  margin-bottom: 10px;
+}
+
+.navbar-inverse {
+  background-color: #2196F3 !important;
+  border: none !important;
+}
+
+.navbar-inverse .navbar-toggle {
+  border-color: #2196F3 !important;
+}
+
+.navbar-inverse .navbar-toggle:hover, .navbar-inverse .navbar-toggle:focus {
+  background-color: #2196F3 !important;
+}
+
+.navbar-inverse .navbar-collapse, .navbar-inverse .navbar-form {
+  border: none !important;
+}
+
+.navbar-inverse .navbar-nav > li > a {
+  color: #ffffff;
+}
+
+.navbar-inverse .navbar-nav > li > a:hover {
+  color: #000000;
+}
+
+.navbar-brand {
+  color: #ffffff !important;
+  font-weight: bold;
+}
+
+#login-dp .help-block {
+  font-size: 12px;
+}
+
+#login-dp .bottom {
+  background-color: rgba(255, 255, 255, .8);
+  border-top: 1px solid #ddd;
+  clear: both;
+  padding: 14px;
+}
+
+#login-dp .social-buttons {
+  margin: 12px 0
+}
+
+#login-dp .social-buttons a {
+  width: 49%;
+}
+
+#login-dp .form-group {
+  margin-bottom: 10px;
+}
+
+.btn-fb {
+  color: #fff;
+  background-color: #3b5998;
+}
+
+.btn-fb:hover {
+  color: #fff;
+  background-color: #496ebc
+}
+
+.btn-tw {
+  color: #fff;
+  background-color: #55acee;
+}
+
+.btn-tw:hover {
+  color: #fff;
+  background-color: #59b5fa;
+}
+
+@media (max-width: 768px) {
+  #login-dp {
+    background-color: inherit;
+    color: #fff;
+  }
+
+  #login-dp .bottom {
+    background-color: inherit;
+    border-top: 0 none;
+  }
+}
+
+.new-project-button {
+  display: table !important;
+  margin: 20px auto !important;
+  /* background: #2196F3 none !important;*/
+}
+
+.project-list {
+  text-align: center;
+  margin: auto;
+  list-style-type: none;
+  padding-left: 0;
+}
+
+/*.project-list a:not(:first-child) li {
+  margin-top: 20px;
+}*/
+
+.project-list-element {
+  color: white;
+  background-color: #2196F3;
+  text-align: center;
+  height: 300px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  border-radius: 3px;
+  margin-bottom: 25px;
+}
+
+.project-list-element:hover {
+  background-color: #1976D2;
+}
+
+.project-list-element span {
+  display: block;
+  color: white;
+}
+
+.project-list a:hover {
+  text-decoration: none;
+}
+
+.project-list .project-name {
+  padding-top: 9px;
+  font-size: 2em;
+}
+
+.project-list .project-description {
+  font-size: 1.2em;
+  height: 60%;
+  padding-top: 15px;
+  padding: 20px;
+}
+
+.project-list .project-settings {
+  position: relative;
+  float: right;
+  right: 10px;
+  font-size: 20px;
+  bottom: 210px;
+}
+
+.project-list .project-owner {
+  float: left;
+  padding-left: 10px;
+}
+
+@media (max-width: 978px) {
+  .project-list {
+    width: 70%;
+  }
+
+  .project-list .project-name {
+    padding-top: 9px;
+    font-size: 2em;
+  }
+
+  .project-list .project-description {
+    font-size: 1.2em;
+    height: 60%;
+    padding-top: 15px;
+    font-size: 0.9em;
+
+  }
+
+  .project-description {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 486px) {
+  .project-list {
+    width: 90%;
+  }
+
+  .project-list .project-name {
+    padding-top: 9px;
+    font-size: 1.5em;
+  }
+
+  .project-list .project-description {
+    height: 60%;
+    padding-top: 15px;
+    font-size: 0.9em;
+  }
+
+  .project-list .project-owner {
+    float: left;
+    padding-left: 10px;
+    font-size: 0.9em;
+  }
+
+  .project-list .project-settings {
+    bottom: -10px;
+  }
+}
+
+.back-button {
+  margin-left: 20px;
+}
+
+.project-list-element {
+  transition: all .2s ease-in-out;
+}
+
+.project-list-element:hover {
+  transform: scale(1.1);
+}
+
+.ui-tooltip, .arrow:after {
+  background: black;
+  border: 2px solid white;
+}
+
+.ui-tooltip {
+  padding: 10px 20px;
+  color: white;
+  border-radius: 20px;
+  box-shadow: 0 0 7px black;
+}
+
+.arrow {
+  width: 70px;
+  height: 16px;
+  overflow: hidden;
+  position: absolute;
+  left: 50%;
+  margin-left: -35px;
+  bottom: -16px;
+}
+
+.arrow.top {
+  top: -16px;
+  bottom: auto;
+}
+
+.arrow.left {
+  left: 20%;
+}
+
+.arrow:after {
+  content: "";
+  position: absolute;
+  left: 20px;
+  top: -20px;
+  width: 25px;
+  height: 25px;
+  box-shadow: 6px 5px 9px -9px black;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+.arrow.top:after {
+  bottom: -20px;
+  top: auto;
+}
+
+.cardList {
+  min-height: 20px;
+  list-style-type: none;
+  margin: 0;
+  padding: 5px 0 0 0;
+  float: left;
+  margin-right: 10px;
+}
+
+.cardList li {
+  display: block;
+  margin: 0 5px 5px 5px;
+  padding: 5px;
+  font-size: 1.2em;
+}
+
+.ui-state-highlight {
+  background: lightgrey;
+  border: 2px;
+  border-color: black;
+  height: 1.5em;
+  line-height: 1.2em;
+}
+
+.category-list {
+  color: #000000;
+  min-height: 20px;
+  list-style-type: none;
+  margin: 0;
+  padding: 5px 0 0 0;
+  float: left;
+  margin-right: 10px;
+}
+
+.category-list h2 {
+  color: #333333;
+}
+
+.category-list-element {
+  display: inline;
+  margin: 0 5px 5px 5px;
+  padding: 5px;
+  font-size: 1.2em;
+  float: left;
+  background: #E2E4E6;
+  border-radius: 3px;
+}
+
+.category-list-element li {
+  background: #ffffff;
+  border-radius: 3px;
+}
+
+@-webkit-keyframes animateaddpermission {
+  from {
+    top: -300px;
+    opacity: 0
+  }
+  to {
+    top: 0;
+    opacity: 1
+  }
+}
+
+@keyframes animateaddpermission {
+  from {
+    top: -300px;
+    opacity: 0
+  }
+  to {
+    top: 0;
+    opacity: 1
+  }
+}
+
+#add-edit-permission-modal {
+  -webkit-animation-name: animateaddpermission;
+  -webkit-animation-duration: 0.4s;
+  animation-name: animatetop;
+  animation-duration: 0.4s;
+}
+
+#add-edit-permission-modal .modal-content {
+  top: 30%;
+  width: 30%;
+  position: relative;
+  background-color: #fefefe;
+  margin: auto;
+  padding: 0;
+  border: 1px solid #888;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  -webkit-animation-name: animateaddpermission;
+  -webkit-animation-duration: 0.4s;
+  animation-name: animatetop;
+  animation-duration: 0.4s;
+}

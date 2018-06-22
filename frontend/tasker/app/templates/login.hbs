@@ -1,17 +1,75 @@
-dupadupa
-<form {{action 'authenticate' on='submit'}}>
-  <p>
-    <label for="username">Login</label>
-    {{input id='username' placeholder='Enter Login' value=username}}
-  </p>
-  <p>
-    <label for="password">Password</label>
-    {{input id='password' placeholder='Enter Password' type='password' value=password}}
-  </p>
-  <p>
-    <button type="submit">Login</button>
-  </p>
-  {{#if error}}
-    <p>{{error}}</p>
-  {{/if}}
-</form>
+<link rel="stylesheet" type="text/css" href="login.css">
+<div class="form">
+
+  <ul class="tab-group">
+    {{#if loginSelected}}
+      <li class="tab"><a {{action 'switchToRegister'}}>Zarejestruj się</a></li>
+      <li class="tab active"><a {{action 'switchToLogin'}}>Zaloguj się</a></li>
+    {{else}}
+      <li class="tab active"><a {{action 'switchToRegister'}}>Zarejestruj się</a></li>
+      <li class="tab"><a {{action 'switchToLogin'}}>Zaloguj się</a></li>
+    {{/if}}"
+
+  </ul>
+
+  <div class="tab-content">
+    {{#unless loginSelected}}
+      <div id="signup">
+        <h1>Zarejestruj się za darmo</h1>
+
+        <form {{action 'register' on='submit'}}>
+
+          <div class="top-row">
+            {{#if error}}
+              <p>{{#each error.firstname as |errors|}}{{errors.message}}{{/each}}</p>
+            {{/if}}
+            {{fancy-text-field value=firstname placeholder='Imię' inputType='text' id='firstname'}}
+            {{#if error}}
+              <p>{{#each error.lastname as |errors|}}{{errors.message}}{{/each}}</p>
+            {{/if}}
+            {{fancy-text-field value=lastname placeholder='Nazwisko' inputType='text' id='lastname'}}
+            {{#if error}}
+              <p>{{#each error.email as |errors|}}{{errors.message}}{{/each}}</p>
+            {{/if}}
+            {{fancy-text-field value=email placeholder='Email' inputType='email' id='email'}}
+            {{#if error}}
+              <p>{{#each error.username as |errors|}}{{errors.message}}{{/each}}</p>
+            {{/if}}
+            {{fancy-text-field value=register-username placeholder='Nazwa użytkownika' inputType='text' id='register-username'}}
+            {{#if error}}
+              <p>{{#each error.password as |errors|}}{{errors.message}}{{/each}}</p>
+            {{/if}}
+            {{fancy-text-field value=register-password placeholder='Hasło' inputType='password' id='register-password'}}
+            {{#if error}}
+              <p>{{#each error.__all__ as |errors|}}{{errors.message}}{{/each}}</p>
+            {{/if}}
+            {{fancy-text-field value=confirm-password placeholder='Potwierdź hasło' inputType='password' id='confirm-password'}}
+
+            {{#if error}}
+              <p>{{#each error.username as |errors|}}{{errors.message}}{{/each}}</p>
+            {{/if}}
+          </div>
+          <button type="submit" class="button button-block">Zarejestruj się!</button>
+        </form>
+
+      </div>
+    {{else}}
+      <div id="login">
+        {{#if signupComplete}}
+          <h1>Dziękujemy za rejestrację!</h1>
+        {{else}}
+          <h1>Witaj z powrotem!</h1>
+        {{/if}}
+        <form {{action 'login' on='submit'}}>
+          {{fancy-text-field value=login-username placeholder='Nazwa użytkownika' inputType='text' id='login-username'}}
+          {{fancy-text-field value=login-password placeholder='Hasło' inputType='password' id='login-password'}}
+          <button id="submit-login" type="submit" class="button button-block">Zaloguj</button>
+          {{#if error}}
+            <p id="errors">Unknown user or incorrect password!</p>
+          {{/if}}
+        </form>
+      </div>
+    {{/unless}}
+  </div><!-- tab-content -->
+</div> <!-- /form -->
+

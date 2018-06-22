@@ -1,0 +1,47 @@
+<form {{action "save" on="submit"}}>
+  <div>
+    <label>
+      Name
+      {{input type="text" value=model.name}}
+    </label>
+  </div>
+  <div>
+    <label>
+      Description
+      {{input type="text" value=model.description}}
+    </label>
+  </div>
+  <div>
+    <label>
+      Datecreated
+      {{input type="text" value=model.dateCreated}}
+    </label>
+  </div>
+  <div>
+    <label>
+      Lastmodified
+      {{input type="text" value=model.lastModified}}
+    </label>
+  </div>
+  <div>
+    <label>
+      Createdby
+      {{input type="text" value=model.createdBy}}
+    </label>
+  </div>
+  <div>
+    <label>
+      Modifiedby
+      {{input type="text" value=model.modifiedBy}}
+    </label>
+  </div>
+  <div>
+    <label>
+      Category
+      {{input type="text" value=model.category}}
+    </label>
+  </div>
+  <div>
+    <input type="submit" value="Save">
+  </div>
+</form>

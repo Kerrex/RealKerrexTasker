@@ -1,0 +1,88 @@
+{{#if (eq priorityId None)}}
+  <li {{action "showCardEditDialog"}} data-card-id="{{card.id}}" class="card">{{card.name}}</li>
+{{else if (eq priorityId "1")}}
+  <li {{action "showCardEditDialog"}} data-card-id="{{card.id}}" class="card low-priority">{{card.name}}</li>
+{{else if (eq priorityId "2")}}
+  <li {{action "showCardEditDialog"}} data-card-id="{{card.id}}" class="card medium-priority">{{card.name}}</li>
+{{else if (eq priorityId "3")}}
+  <li {{action "showCardEditDialog"}} data-card-id="{{card.id}}" class="card high-priority">{{card.name}}</li>
+{{/if}}
+<div id="{{cardDetailsDialogId}}">
+  <form {{action 'editCard' on='submit'}}>
+    <fieldset>
+      <div>
+        <h3>Card name</h3>
+        {{#if editingName}}
+          {{input id="name-edit-input" escape-press="disableEditName" focus-out="disableEditName" name="newCardName"
+                  value=card.name class="text ui-widget-content ui-corner-all" class="edit-name-textarea"}}
+        {{else}}
+          <textbox {{action "enableEditName"}} class="text ui-widget-content ui-corner-all">{{card.name}}</textbox>
+        {{/if}}
+      </div>
+      <div>
+        <h3>Card description</h3>
+        {{#if editingDescription}}
+          {{textarea id="description-edit-input" escape-press="disableEditDescription"
+                     focus-out="disableEditDescription"
+                     value=card.description class="edit-description-textarea"}}
+        {{else}}
+          {{#if isDescriptionEmpty}}
+            <textbox {{action "enableEditDescription"
+                              class="text ui-widget-content ui-corner-all"}}>Click here to add description
+            </textbox>
+          {{else}}
+            <textbox {{action "enableEditDescription"
+                              class="text ui-widget-content ui-corner-all"}}>{{card.description}}</textbox>
+
+          {{/if}}
+        {{/if}}
+      </div>
+      <div class="show-on-calendar">
+        <h3>Calendar options</h3>
+        Show on calendar:
+        {{input type="checkbox" checked=showOnCalendar}}
+        {{#if showOnCalendar}}
+          <p>Start date: {{#unless (eq card.calendarDateStart null)}}
+            {{calendarDateStartFormatted}}
+          {{else}}
+            Date not selected yet. Please visit calendar!
+          {{/unless}}</p>
+          <p>End date: {{#unless (eq card.calendarDateEnd null)}}
+            {{calendarDateEndFormatted}}
+          {{else}}
+            Date not selected yet. Please visit calendar!
+          {{/unless}}</p>
+        {{/if}}
+      </div>
+      <div class="select-priority">
+        <h3>Select priority</h3>
+        <form>
+          <div>
+            {{#radio-button value=None name="priority" groupValue=priorityId}}None{{/radio-button}}
+          </div>
+            {{#each priorities as |priority|}}
+              <div>
+                {{#radio-button value=priority.id name="priority" groupValue=priorityId}}
+                  {{priority.name}}
+                {{/radio-button}}
+              </div>
+            {{/each}}
+        </form>
+      </div>
+      <div class="last-modification-details modal-footer">
+        Last modification: <b>{{dateModifiedFormatted}}</b> by {{card.modifiedBy.username}}
+        {{card.modifiedBy.first_name}}
+        {{#if card.modifiedBy.first_name}}
+          ({{card.modifiedBy.first_name}} {{card.modifiedBy.last_name}})
+        {{/if}}
+        <br>
+        Created: <b>{{dateCreatedFormatted}}</b> by {{card.createdBy.username}}
+      </div>
+      <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+    </fieldset>
+  </form>
+  {{#if notifications.length}}
+  {{else}}
+  {{/if}}
+
+</div>
